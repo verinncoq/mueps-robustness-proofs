@@ -1,0 +1,86 @@
+\section{Existence of Robust Partitions}
+\label{sec:existence}
+
+The main criticism of $\epsilon$-robustness is that it is impossible to satisfy as separability cannot be enforced on a decision boundary. We will explore our two-fold answer to this critique. First, we should notice that the non-satisfiability argument only applies to continuous domains such as real numbers, while most classifiers operate on a discrete domain of floating-point numbers. Second, this problem is alleviated for $(\mu,\epsilon)$-robustness. To support two arguments with mathematical evidence, we will prove conditions for existence of at least one non-constant robust classifier partition. In Section~\ref{subsec:general-existence}, we derive a general criterion on an arbitrary semimetric space, and in Section~\ref{subsec:existence-order}, we specialize it to ordered semimetric spaces, thus creating a connection to finite precision arithmetic.
+
+\subsection{General Existence Criterion}
+\label{subsec:general-existence}
+
+We study the conditions under which $(\mu, \epsilon)$-robustness is satisfiable by a non-constant classifier, i.e. one that distinguishes between at least two classes. The following result shows that $(\mu, \epsilon)$-robustness imposes structural constraints on the domain.
+% lax begin Lax544225.GeneralExistence
+\begin{theorem}[General Existence]
+\label{thm:existence}
+Let $(S,d)$ a semimetric space and $\mu \geq 0, \epsilon > 0$. The following statements are equivalent:
+\begin{enumerate}
+    \item The only $(\mu,\epsilon)-$robust partition on $S$ is trivial.
+    \item For all nonempty $S' \subset S$, there exists $x \in S$ such that either $x \in S'$ and $B(x,\mu) \subseteq \bigcup_{x' \in S \setminus S'} B(x', \epsilon)$ or $x \in S \setminus S'$ with $B(x,\mu) \subseteq \bigcup_{x' \in S'} B(x', \epsilon)$.
+\end{enumerate}
+\end{theorem}
+% lax end
+\begin{proof}
+    We prove each direction separately:
+
+    $(1.) \Rightarrow (2.)$:
+    Assume (1.) and let $S' \subset S$ be a proper subset such that condition (2.) is false. We prove that $P := \{S', S\setminus S'\}$ is $(\mu, \epsilon)$-robust, leading to contradiction with (1.). If $P$ is not robust, then by Theorem~\ref{thm:separability} there exists $x \in S$ with either $x \in S'$ and $B(x, \mu) \subseteq \bigcup_{x' \in S \setminus S'} B(x', \epsilon)$ or $x \in S \setminus S'$ with $B(x,\mu) \subseteq \bigcup_{x' \in S'} B(x', \epsilon)$. Note that it is exactly the condition (2.) of this theorem, which was assumed to be false, implying by contradiction that $P$ is a robust partition.
+
+    $(2.) \Rightarrow (1.)$:
+    Assume (2.) and let $P := \{S_1, \dots, S_n\}$ with $n > 1$ be any robust partition of $S$. For contradiction, we show that $S_1$ violates (2.). By condition (2.) from Theorem~\ref{thm:separability}, there is no $x \in S_1$ with $B(x, \mu) \subseteq \bigcup_{x' \in S \setminus S_1} B(x', \epsilon)$. It leaves the case that $x \in S \setminus S_1$ with $B(x,\mu) \subseteq \bigcup_{x' \in S_1} B(x', \epsilon)$. This means that $x \in S_i$ for some $ i \in \{2,\dots,n\} \subset [n]$ and by Theorem~\ref{thm:separability}, $B(x, \mu) \not\subseteq \bigcup_{x' \in S\setminus S_i} B(x', \epsilon)$. As $\bigcup_{x' \in S_1} B(x', \epsilon) \subseteq \bigcup_{x' \in S\setminus S_i} B(x', \epsilon)$, $S_1$ violates condition (2.) of this theorem in all cases.
+    \qed
+\end{proof}
+
+Given fixed $\mu$ and $\epsilon$, Theorem~\ref{thm:existence} establishes a class of semimetric spaces that have at least one nontrivial robust partition. It shows that impossibility of robustness is not a universal phenomenon but depends on structural properties of the underlying domain. In fact, many sets and distance functions violate condition (2) of Theorem~\ref{thm:existence}. For example, consider the set $\{0,2,4,6\}$ with the standard metric $d(x,y) = |x - y|$ and let $\epsilon = 1$. This observation demonstrates the benefits of providing mathematical clarity by replacing informal arguments with rigorous analysis.
+
+\subsection{Existence of a Robust Partition on a Total Order}
+\label{subsec:existence-order}
+
+% lax begin Lax544225.Boundary
+Denote by $Succ(x,y)$ a formula that is true if $x < y$ and there is no $z$ with $x < z < y$. We start with results on finite totally ordered semimetric spaces $(S, <, d)$ where $S$ is arbitrary and the order $<$ is total. For each subset $S' \subseteq S$ of such a space, a \emph{boundary} $\partial S' = \{x \in S' \,|\, \exists y \not\in S' . Succ(x,y) \vee Succ(y,x)\}$ and \emph{complement boundary} $\overline\partial S' = \{x \not\in S' \,|\, \exists y \in S' . Succ(x,y) \vee Succ(y,x)\}$.
+% lax end
+
+% lax begin Lax544225.BoundaryCoveringCharacterization
+\begin{theorem}
+\label{thm:existence-total}
+    Let $(S, <, d)$ be a finite totally ordered semimetric space and $\mu \geq 0, \epsilon > 0$. The following two statements are equivalent:
+    \begin{enumerate}
+        \item For all nonempty $S' \subset S$, there exists $x \in S$ such that either $x \in S'$ and $B(x,\mu) \subseteq \bigcup_{x' \in S \setminus S'} B(x', \epsilon)$ or $x \in S \setminus S'$ with $B(x,\mu) \subseteq \bigcup_{x' \in S'} B(x', \epsilon)$.
+        \item For all nonempty $S' \subset S$, there exists $x \in S$ such that either $x \in S'$ and $(B(x,\mu) \cap S') \subseteq \bigcup_{x' \in \overline{\partial}S'} B(x', \epsilon)$ or $x \in S \setminus S'$ with $(B(x,\mu) \cap (S \setminus S')) \subseteq \bigcup_{x' \in \partial S'} B(x', \epsilon)$.
+    \end{enumerate}
+\end{theorem}
+% lax end
+\begin{proof}
+    Again, we prove each direction separately:
+
+    \textbf{(1.) $\Rightarrow$ (2.)}:
+    To prove (2.) of this theorem, pick any nonempty $S' \subset S$. By applying (1.) to $S'$, we get two cases:
+    \begin{itemize}    
+        \item \textit{1. Case: $x \in S'$ and $B(x,\mu) \subseteq \bigcup_{x' \in S \setminus S'} B(x', \epsilon)$}. To show (2.), we will prove that $(B(x,\mu) \cap S') \subseteq \bigcup_{x' \in \overline{\partial}S'} B(x', \epsilon)$. Pick some $x^* \in B(x, \mu) \cap S'$ and select some $x'' \in S \setminus S'$ with $x^* \in B(x'', \epsilon)$, which exists by assumption. W.l.o.g. assume that $x^* < x''$, implying existence of a $x_{\overline{\partial}} \in \overline{\partial} S'$ with $x^* \leq x_{\overline{\partial}} \leq x''$. Then, $d(x^*, x_{\overline{\partial}}) \leq d(x^*, x'') \leq \epsilon$ by Definition~\ref{def:ordered-space}. From this, $x^* \in B(x_{\overline{\partial}}, \epsilon)$ follows. As such $x_{\overline{\partial}} \in \overline{\partial} S'$ exists for each $x^* \in B(x, \mu) \cap S'$, we deduce $(B(x,\mu) \cap S') \subseteq \bigcup_{x' \in \overline{\partial}S'} B(x', \epsilon)$, and (2.) is proven.
+        \item \textit{2. Case: $x \in S \setminus S'$ and $B(x,\mu) \subseteq \bigcup_{x' \in S'} B(x', \epsilon)$.} Proven analogously to the 1. Case by finding $x_{\partial} \in \partial S'$ for each $x^* \in B(x,\mu) \cap S \setminus S'$ for some $x \in S$.
+    \end{itemize}
+
+    \textbf{(2.) $\Rightarrow$ (1.)}:
+    To prove (1.), pick a nonempty $S' \subset S$. By (2.), there exists $x \in S$ satisfying one of two conditions in (2.). We get two cases:
+    \begin{itemize}
+        \item \textit{1. Case: $x \in S'$ and $(B(x, \mu) \cap S') \subseteq \bigcup_{x' \in \overline{\partial}S'}  B(x', \epsilon)$}. Consider some $x^* \in B(x, \mu)$. If $x^* \in S'$ then by (2.), $x^* \in \bigcup_{x' \in \overline{\partial}S'} B(x', \epsilon) \subseteq \bigcup_{x' \in S \setminus S'} B(x', \epsilon)$. If $x^* \in S \setminus S'$ then $x^* \in B(x^*, \epsilon) \subseteq \bigcup_{x' \in S \setminus S'} B(x', \epsilon)$. Combined, we deduce $B(x, \mu) \subseteq \bigcup_{x' \in S \setminus S'} B(x', \epsilon)$ and (1.) is proven.
+        \item \textit{2. Case: $x \in S \setminus S'$ and $(B(x,\mu) \cap (S \setminus S')) \subseteq \bigcup_{x' \in \partial S'} B(x', \epsilon)$.} Proven similarly to the 1. Case.
+    \end{itemize}
+    \qed
+\end{proof}
+
+% lax begin Lax544225.BoundaryExistence
+\begin{corollary}
+    \label{cor:existence-total}
+    Let $(S, <, d)$ a finite totally ordered semimetric space and $\mu \geq 0, \epsilon > 0$. The following two statements are equivalent:
+    \begin{enumerate}
+        \item The only robust partition on $S$ is trivial.
+        \item For all nonempty $S' \subset S$, there exists $x \in S$ such that either $x \in S'$ and $(B(x,\mu) \cap S') \subseteq \bigcup_{x' \in \overline{\partial}S'} B(x', \epsilon)$ or $x \in S \setminus S'$ with $(B(x,\mu) \cap (S \setminus S')) \subseteq \bigcup_{x' \in \partial S'} B(x', \epsilon)$.
+    \end{enumerate}
+\end{corollary}
+% lax end
+\begin{proof}
+    Note that condition (1.) in Theorem~\ref{thm:existence-total} is exactly condition (2.) in Theorem~\ref{thm:existence}.
+\end{proof}
+
+With this, we established necessary and sufficient conditions for the existence of a nontrivial robust partition in an ordered semimetric space. Note that since Theorem~\ref{thm:existence-total} is an equivalence condition, condition (2.) cannot be simplified further. A covered $B(x, \mu)$ is not necessarily produced by $x \in \partial S'$ or $x \in \overline{\partial} S'$. In addition, multiple $\epsilon$-balls may be required to cover a $\mu$-ball. In summary, we can observe that studying equivalent conditions to existence does not lead to simple conditions. Due to this observation, we will switch to estimating upper bounds on parameters $\mu$ and $\epsilon$ for nontrivial robust partitions.
+
+
+

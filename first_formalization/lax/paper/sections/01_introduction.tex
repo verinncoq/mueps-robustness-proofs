@@ -1,0 +1,70 @@
+\section{Introduction}
+
+Machine learning classifiers can change their prediction under small input perturbations, raising concerns about safety, security, and ethics. 
+A central notion for studying this phenomenon is \emph{global robustness}:
+ a classifier is $\epsilon$-robust if it assigns the same label to any two inputs within
+distance~$\epsilon$~\cite{casadio2022neural}. 
+The distance encodes similarity and differs by domain. 
+In computer vision, distances on pixel intensities are common~\cite{wang2026survey}. 
+In fairness, the distance encodes context-dependent similarity of individuals, for instance, being equally qualified for a job~\cite{fairness-landscape,kusner2017counterfactual,ranking-fairness}.
+In natural language processing, it encodes syntactic and semantic similarity under meaningful linguistic variation~\cite{levy2025statistical}.
+Importantly, these notions of similarity may \emph{not} be metric, as they may violate the triangle inequality~\cite{garcia2019learning,similarity-guide}.
+We therefore study robustness over arbitrary \emph{semimetric} spaces.
+On connected domains such as $\mathbb{R}^n$, every $\epsilon$-robust classifier
+is essentially constant: overlapping $\epsilon$-balls form chains between any two inputs,
+and the label must agree along each chain.
+Existing work has addressed this limitation by weakening the notion: 
+local robustness restricts it to hand-picked
+inputs~\cite{li2024certifying}; confidence-based notions to high-confidence
+inputs~\cite{athavale2024verifying,leino2021globally}; probabilistic notions bound the probability of
+drawing an $\epsilon$-close pair with different labels~\cite{mangal2019robustness,levy2023groma}.
+Probabilistic bounds, however, constrain how many inputs are non-robust, not the geometric structure
+where they lie: Fig.~\ref{fig:grid} shows a classifier that satisfies such a
+bound although no input is locally robust.
+
+To address this limitation, we introduce $(\mu,\epsilon)$-robustness:
+Every input must lie within distance $\mu$ of a point with the same label at which the classifier is locally $\epsilon$-robust. 
+The property recovers $\epsilon$-robustness at $\mu = 0$.
+Unlike probabilistic relaxations, it constrains where non-robust points may lie by imposing an explicit coverage structure on non-robust points:
+they form bands of width at most~$\mu$ around locally robust points.
+Two of our main results, a covering characterization of robustness and a necessary-and-sufficient criterion for the
+existence of a non-constant robust classifier, hold over arbitrary semimetric spaces,
+providing a domain-independent foundation.
+Further, the impossibility result above is a consequence of \emph{connected
+continuous} domains, whereas deployed classifiers compute over finite-precision
+arithmetic. In fact, verification methods reasoning over reals can be unsound 
+due to their abstraction~\cite{jia2021exploiting,cordeiro2025neural} showing that the fact that deployed systems operate over finite representable values rather than continuous domains has significant implications.
+On a finite domain, $\epsilon$-balls can only build chains if $\epsilon$ exceeds the gaps between discrete values, so
+whether a non-constant robust classifier exists becomes a quantitative question
+about $\epsilon$, $\mu$, and the spacing between values of the domain.
+
+\paragraph{Contributions.}
+Studying $(\mu,\epsilon)$-robustness gives us domain-independent structural results and quantitative guarantees that can be specialized (see Section~\ref{sec:modeling-arithmetic}) to finite-precision arithmetic:
+\begin{enumerate}
+\item \textbf{Covering characterization.}
+We first introduce $(\mu,\epsilon)$-robustness (Section~\ref{sec:new-robustness})
+and then present a covering characterization of $(\mu,\epsilon)$-robustness (Section~\ref{sec:partitions-covering}), formally proving and extending the classical connection between $\epsilon$-robustness and separability~\cite{yang2020closer,mangal2023certifying}.
+
+\item \textbf{Existence criteria.}
+We first introduce a floating-point model (Section~\ref{sec:modeling-arithmetic}), and
+then 
+derive necessary and sufficient conditions for the existence of a non-constant robust classifier (Section~\ref{sec:existence}), both for arbitrary semimetric spaces and for finite totally ordered domains.
+
+\item \textbf{Precision-dependent bounds.}
+We obtain bounds on $\epsilon$ and $\mu$ in terms of the largest and smallest representable gaps (Section~\ref{sec:upper-bounds}). These bounds explain empirically observed robustness gains under coarser quantization~\cite{xiao2023robustmq,shrestha2024properties,duncan2020relative}, and extend to some partially ordered domains.
+
+\item \textbf{Mechanization.} All results are mechanized in Lean~4\footnote{\url{https://github.com/verinncoq/mueps-robustness-proofs},
+  archived in LAX as \url{https://laxarchive.org/lax-544225/paper.html}.}. 
+  The machine-checked proofs were
+  developed with AI assistance, and we manually validated
+  that the formal statements match those in the document. To connect our
+  floating-point model (Section~\ref{sec:modeling-arithmetic}) to an established IEEE~754 semantics, an AI assistant autonomously
+  verified the constructions in Rocq on top of
+  Flocq~\cite{boldo2011flocq}, and differentially tested the resulting executable
+  distances against an independent implementation on special values and
+  randomly generated binary64 bit patterns.
+
+\end{enumerate}
+Our results concern whether robust classifiers \emph{exist} in a given domain;
+whether an \emph{accurate} robust classifier exists and how robust
+models are trained and verified are orthogonal to our focus.

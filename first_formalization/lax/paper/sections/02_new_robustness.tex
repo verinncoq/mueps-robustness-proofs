@@ -1,0 +1,109 @@
+\section{$(\mu,\epsilon)$-Robustness}
+\label{sec:new-robustness}
+
+We define classifier robustness in its usual form, survey related work containing other approaches to defining global robustness and highlight differences to our proposed formulation.
+
+\paragraph{$\epsilon$-Robustness.} Local classifier robustness is an intuitive property widely accepted in the literature, which we formulate over semimetric spaces. We use the notation $[n] := \{1, 2, \dots,n\} \subset \mathbb{N}$.
+% lax begin Lax544225.Classifier
+\begin{definition}[Classifier]
+\label{def:classifier}
+Let $S$ be a set of \enquote{inputs}  and  $[n]$ a set of \enquote{classes}. 
+A \emph{classifier} is a total, surjective function:
+$c: S \rightarrow [n]$. 
+\end{definition}
+% lax end
+Surjectivity is assumed to exclude unused labels and simplify notation.
+% lax begin Lax544225.Semimetric
+\begin{definition}[Semimetric Space]
+\label{def:distance}
+    Let $(S, d)$ be a pair of a nonempty set and a function $d: S \times S \rightarrow \mathbb{R}_{\geq 0}$ such that for all $x,y \in S$, $d(x,y) = 0 \iff x = y$ (identity of indiscernibles) and $d(x,y) = d(y,x)$ (symmetry). Then, we call $(S, d)$ a \emph{semimetric space} and $d$ a \emph{distance} function on $S$.
+\end{definition}
+% lax end
+Using a distance, we define local $\epsilon$-robustness at an input $x^*$ requiring that sufficiently close (similar) inputs receive the same label. If it holds for all possible inputs, the classifier is globally $\epsilon$-robust.
+% lax begin Lax544225.ClassifierRobustness
+\begin{definition}[$\epsilon$-Robustness]
+\label{def:local-robustness}
+Let $(S,d)$ be a semimetric space. A classifier $c: S \rightarrow [n]$ is \emph{locally robust} at a point $x^* \in S$ for $\epsilon > 0$ if:
+$$\forall x \in S [d(x, x^*) \leq \epsilon \rightarrow c(x) = c(x^*)].$$    
+\end{definition}
+% lax end
+If a classifier $c$ is given, we call $x \in S$ a \textit{(non-)robust point} if $c$ is (not) locally robust on $x$. If a classifier is robust at all points in $S$, it is \emph{globally} $\epsilon$-robust.
+
+\paragraph{Research Gap.} Consider the question of defining global robustness. An obvious way is to enforce local robustness for every point. But as ref. \cite{li2024certifying} points out, \textit{"local robustness verification cannot be directly generalized to the whole decision region of a class"} because the distance can \textit{"cross decision boundaries [...], making a verification task unrealistic"}. It is easy to see that points close to the true decision boundary are not robust which makes robustness on every point infeasible. 
+
+Many studies explore global robustness under additional assumptions. Different authors restrict robustness to specific datasets or underlying data distributions~\cite{casadio2022neural,tsipras2018robustness,zhang2019theoretically,yang2020closer,mangal2023certifying}. Some authors study the trade-off between robustness and accuracy and demonstrate that, for a particular classification problem, improvements in accuracy necessarily come at the cost of robustness~\cite{tsipras2018robustness,zhang2019theoretically}.
+In contrast, others show that robustness and accuracy can positively correlate when class distributions are separable, a property observed in several standard image datasets~\cite{yang2020closer,mangal2023certifying}. 
+
+\begin{figure}[t]
+\centering
+\definecolor{muBlue}{HTML}{1F4E79}
+\definecolor{epsOrange}{HTML}{D9730D}
+\begin{tikzpicture}[scale=0.58]
+  % lightly shaded l-infinity epsilon-balls of the minority inputs:
+  % together they cover the whole grid
+  \foreach \x in {2,7}{
+    \foreach \y in {2,7}{
+      \fill[orange!10] (\x-2.5,\y-2.5) rectangle (\x+2.5,\y+2.5);
+    }
+  }
+
+  % faint grid to read the lattice as a grid of inputs;
+  % the thick ball boundaries run between rows and columns of inputs
+  \foreach \i in {0,...,9}{\draw[gray!18] (\i,-0.5)--(\i,9.5);}
+  \foreach \j in {0,...,9}{\draw[gray!18] (-0.5,\j)--(9.5,\j);}
+
+  % l-infinity epsilon-balls of the minority inputs (half-width eps=2.5)
+  \foreach \x in {2,7}{
+    \foreach \y in {2,7}{
+      \draw[epsOrange, very thick] (\x-2.5,\y-2.5) rectangle (\x+2.5,\y+2.5);
+    }
+  }
+
+  % eps arrow (half-width of an l-inf ball), drawn beneath the inputs
+  \draw[<->,thick,gray!70] (2,2) -- (4.5,2);
+  \node[anchor=south,inner sep=1.5pt] at (3.3,2.05) {\footnotesize $\epsilon$};
+
+  % majority-label (class A) inputs on the whole grid
+  \foreach \i in {0,...,9}{
+    \foreach \j in {0,...,9}{
+      \fill[muBlue] (\i,\j) circle (1.7pt);
+    }
+  }
+
+  % minority-label (class B) inputs on a sparse sublattice
+  \foreach \x in {2,7}{
+    \foreach \y in {2,7}{
+      \fill[epsOrange] (\x-0.17,\y) -- (\x,\y+0.17) -- (\x+0.17,\y) -- (\x,\y-0.17) -- cycle;
+    }
+  }
+
+  % compact legend to the right of the grid
+  \begin{scope}[shift={(10.7,5.7)}]
+    \fill[muBlue] (0,0) circle (1.7pt);
+    \node[anchor=west] at (0.35,0) {\footnotesize majority label $A$};
+    \fill[epsOrange] (-0.17,-1) -- (0,-0.83) -- (0.17,-1) -- (0,-1.17) -- cycle;
+    \node[anchor=west] at (0.35,-1) {\footnotesize minority label $B$};
+    \draw[epsOrange, very thick, fill=orange!10] (-0.05,-2.5) rectangle (0.5,-1.95);
+    \node[anchor=west] at (0.7,-2.225) {\footnotesize $\epsilon$-ball of $B$};
+  \end{scope}
+\end{tikzpicture}
+\caption{Probabilistic robustness does not constrain the \emph{structure} of
+non-robust points. In the image, inputs of class $B$ are rare, so a randomly drawn
+$\epsilon$-close pair is almost always same-label and density-based
+robustness bound is met. Yet the $B$ inputs sit on a sublattice whose
+$\epsilon$-balls (which become squares with $\ell_\infty$ norm) cover the entire input domain: every input of
+the majority class $A$ lies within $\epsilon$ of some input of class $B$, so no input is locally robust.}
+\label{fig:grid}
+\end{figure}
+
+When it comes to measuring global robustness, many authors introduce additional concepts to avoid working with robustness at every point. A common approach is to enforce robustness only at points where a classifier has high confidence~\cite{athavale2024verifying,leino2021globally}. This solution creates another problem of ensuring that classifier prediction is achieved with high confidence whenever required~\cite{el2010foundations,chow1970optimum}. Another popular approach is to enforce that the probability of finding a pair $x, x^*\in S$ with $d(x,x^*) \leq \epsilon$ and $c(x) \neq c(x^*)$ is less than some threshold value~\cite{levy2023groma,li2024certifying,mangal2019robustness}. The probabilistic approach only bounds the density of non-robust points and does not tell anything about their structure. For example, a grid of singular points such as one in Figure~\ref{fig:grid} with a different classifier label from its neighbors can result in a satisfaction of probabilistic robustness for a classifier that has no robust points (as they have a non-robust point from the grid as a neighbor).
+
+\paragraph{This Work: $(\mu,\epsilon)$-Robustness.} In this work, we explore a new version of global classifier robustness. We consider a classifier to be $(\mu,\epsilon)$-robust if every non-robust point has a robust point located at most $\mu$-far. Note that $(0,\epsilon)$-robustness is equivalent to $\epsilon$-robustness.
+% lax begin Lax544225.ClassifierRobustness
+\begin{definition}[$(\mu,\epsilon)$-Robustness]
+\label{def:mueps}
+Let $(S,d)$ be a semimetric space and\linebreak $c: S \rightarrow [n]$ a classifier. $c$ is $(\mu, \epsilon)$-robust for $\mu \in \mathbb{R}_{\geq0}$ and $\epsilon \in \mathbb{R}_{>0}$ if for each $x \in S$, there exists $x' \in S$ with $d(x,x') \leq \mu$ such that $c(x) = c(x')$ and $c$ is locally $\epsilon$-robust at $x'$.
+\end{definition}
+% lax end
+
+This property is a novel domain-independent version of global classifier robustness. Intuitively, robust points act as anchors that cover the input domain. Non-robust points are allowed, but only if each of them lies within distance $\mu$ of a robust point with the same label. Thus, unlike probabilistic notions that only bound the number of non-robust points, $(\mu,\epsilon)$-robustness constrains their geometric arrangement. A non-robust region cannot appear arbitrarily far from robust regions but must be associated with a $\mu$-close robust region. Conversely, only robust points can enable the existence of non-robust points within distance $\mu$. In this sense, $(\mu,\epsilon)$-robustness relaxes global robustness without fully abandoning guarantees on the structure of robustness violations. In the following sections, we will explore properties of $(\mu,\epsilon)$-robust classifiers in more detail.

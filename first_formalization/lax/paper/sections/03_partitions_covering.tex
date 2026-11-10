@@ -1,0 +1,178 @@
+\section{Robust Partitions via Covering}
+\label{sec:partitions-covering}
+
+In this section, we pursue two goals. First, we introduce a formulation of $(\mu,\epsilon)$-robustness using partitions. We then show that $(\mu,\epsilon)$ is equivalent to covering, mirroring equivalence of $\epsilon$-robustness to separability.
+
+\subsection{Robust Partitions}
+
+To avoid ambiguities, we introduce some well-known definitions from the literature that are relevant to our developments.
+% lax begin Lax544225.Partitions
+\begin{definition}[Partition]
+\label{def:partition}
+A collection of nonempty sets $\{P_1,\dots,P_p\}$ is a partition of a set $S$ iff
+\begin{enumerate}
+    \item $\bigcup_{i \in [p]} P_i = S$ and
+    \item $P_i \cap P_j = \emptyset$ for all $i \neq j$.
+\end{enumerate} 
+The partition $\{S\}$ on the set $S$ is called \emph{trivial}.
+\end{definition}
+% lax end
+% lax begin Lax544225.Partitions
+\begin{definition}[Classifier Induced Partition]
+\label{def:induced-partition}
+    A classifier $c: S \rightarrow [n]$ induces a partition $P^c := \{S^c_1, S^c_2, \dots S^c_n\}$ with $S^c_i := \{x \in S\,|\,c(x) = i\}$.
+\end{definition}
+% lax end
+Robustness is often described as invariance under $\epsilon$-sized perturbations. This perspective allows us to reformulate robustness, for which we define the close neighborhood around an input as an $\epsilon$-ball:
+% lax begin Lax544225.Balls
+\begin{definition}[$\epsilon$-Ball]
+\label{def:epsilon-ball}
+Let $(S, d)$ be a semimetric space. Then $B(x^*, \epsilon) := \{x \in S\,|\,d(x,x^*) \leq \epsilon\}$ is an \emph{$\epsilon$-ball} around $x^*$.
+\end{definition}
+% lax end
+Despite the name, $B(x^*, \epsilon)$ may not resemble a geometric ball. In fairness notions, for example, the distance function may capture similarity in qualification of individuals rather than geometric proximity of their attribute vectors.
+% lax begin Lax544225.PartitionRobustness
+\begin{definition}[$(\mu,\epsilon)$-Robustness of a Partition]
+\label{def:mueps-robustness-partition}
+Let $(S,d)$ be a semimetric space. Then a partition $P := \{S_1,\dots,S_p\}$ of $S$
+is \emph{globally $(\mu, \epsilon)$-robust} for $\mu \geq 0, \epsilon > 0$ if and only if:
+$$\forall x \in S\,\exists x' \in B(x,\mu) \,[\bigvee_{i \in [p]} (\{x\} \cup B(x', \epsilon) \subseteq S_i)].$$
+\end{definition}
+% lax end
+This subtle reformulation completely shifts $(\mu,\epsilon)$-robustness to a property of the induced partition. 
+By working with partitions, our framework does not require the number of classes to be specified a priori, unlike some existing approaches~\cite{yang2024geometric}. To streamline subsequent results, we will use the term \emph{$(\mu,\epsilon)$-robust partition} for partitions that satisfy Definition~\ref{def:mueps-robustness-partition}. If parameters are clear from the context, we will omit $(\mu,\epsilon)$.
+
+\subsection{From Separability to Covering}
+
+A folklore characterization of global robustness is through its equivalence to \emph{$\epsilon$-separability}~\cite{yang2020closer,mangal2023certifying}. We can extend this property to our new robustness notion, albeit in a more complicated form as a covering condition. 
+% lax begin Lax544225.CoveringCharacterization
+\begin{theorem}
+\label{thm:separability}
+    Let $(S,d)$ a semimetric space, $P := \{S_1, \dots, S_n\}$ a partition of $S$ and $\mu \geq 0, \epsilon > 0$. Then the following are equivalent:
+    \begin{enumerate}
+        \item $P$ is $(\mu,\epsilon)$-robust.
+        \item for all $S_i \in P$ and all $x \in S_i$ holds that $B(x, \mu) \not\subseteq \bigcup_{x^* \in S \setminus S_i} B(x^*, \epsilon)$.
+    \end{enumerate}
+\end{theorem}
+% lax end
+\begin{proof}
+    We prove both directions separately.
+
+    $(1.) \Rightarrow (2.)$: 
+    For contradiction, assume that (1.) holds but (2.) does not. In this case, there exists $S_i \in P$ with $x \in S_i$ such that $B(x,\mu) \subseteq \bigcup_{x^* \in S \setminus S_i} B(x^*, \epsilon)$. From Definition~\ref{def:mueps-robustness-partition}, there exists $x' \in B(x,\mu)$ with $B(x',\epsilon) \subseteq S_i$. From symmetry of distance (Definition~\ref{def:distance}), it follows that $x' \notin \bigcup_{x^* \in S \setminus S_i} B(x^*, \epsilon)$, leading to a contradiction with (1.).
+
+    $(2.) \Rightarrow (1.)$:
+    
+    Similarly, assume that (2.) holds but not (1.). By negating the robustness condition in Definition~\ref{def:mueps-robustness-partition}, there exists $x \in S$ such that for all $x' \in B(x,\mu)$ have $B(x', \epsilon) \not\subseteq S_i$ for all $S_i \in P$. Pick a specific $S_i' \in P$ such that $x \in S_i'$. By symmetry of distance, each $x' \in B(x,\mu)$ is also contained in some $B(x^*,\epsilon)$ with $x^* \notin S_i'$. This implies $B(x, \mu) \subseteq \bigcup_{x^* \in S \setminus S_i'} B(x^*, \epsilon)$, raising a contradiction to (2.).
+    \qed
+\end{proof}
+
+\begin{figure}[t]
+  \centering
+  \definecolor{muBlue}{HTML}{1F4E79}
+  \definecolor{epsGreen}{HTML}{2E8B57}
+  \definecolor{epsOrange}{HTML}{D9730D}
+  \begin{tikzpicture}[scale=1.5, every node/.style={transform shape},
+      classLine/.style = {black!75, line width=0.9pt},
+      ballS2/.style    = {draw=epsGreen,  thick},
+      ballS3/.style    = {draw=epsOrange, thick},
+      dotS1/.style     = {circle, fill=muBlue,    inner sep=1.5pt},
+      dotS2/.style     = {circle, fill=epsGreen,  inner sep=1.5pt},
+      dotS3/.style     = {circle, fill=epsOrange, inner sep=1.5pt},
+      radArrow/.style  = {-{Stealth[length=2.2mm]}, thin, gray!70},
+    ]
+    % ----------------------------------------------------------------
+    % Geometry (numerically verified):
+    %   decision boundary (vertical, wiggly):
+    %     x(y) = 0.55 - 0.85*cos(3y)   [3 rad = 171.9 degrees]
+    %   S_1 = right of the curve, S_2/S_3 = left of it (split at y=-0.1)
+    %   x   = (0, 0) in S_1,  mu  = 1.1
+    %   eps = 1.0   (mu = 1.1*eps > eps)
+    %   eps-balls (radius 1.0), centers in S_2 / S_3:
+    %     x_1 = ( 0.28,  0.48)  in S_2
+    %     x_2 = (-0.55,  0.00)  in S_2
+    %     x_3 = ( 0.28, -0.48)  in S_3
+    %   The three eps-balls cover the mu-ball of x completely
+    %   (max distance of any mu-ball point to the nearest center: 0.953);
+    %   neither S_2 alone nor S_3 alone covers it.
+    %   Note: three eps-disks can cover a mu-disk of radius at most
+    %   2*eps/sqrt(3) ~ 1.155*eps, so mu = 1.1*eps is near the
+    %   largest ratio possible with three covering balls.
+    %   Canvas is cropped tight: x in [-1.75,1.5], y in [-1.7,1.7].
+    % ----------------------------------------------------------------
+    \coordinate (x)  at (0,0);
+    \coordinate (x1) at (0.28,0.48);
+    \coordinate (x2) at (-0.55,0);
+    \coordinate (x3) at (0.28,-0.48);
+
+    % ---- landscape: the three class regions ---------------------------
+    \fill[blue!8]                                            % S_1 (right)
+      plot[domain=1.7:-1.7, samples=250, smooth]
+        ({0.55-0.85*cos(171.9*\x)},{\x})
+      -- (1.5,-1.7) -- (1.5,1.7) -- cycle;
+    \fill[green!12]                                          % S_2 (upper left)
+      (-1.75,1.7)
+      -- plot[domain=1.7:-0.1, samples=150, smooth]
+           ({0.55-0.85*cos(171.9*\x)},{\x})
+      -- (-1.75,-0.1) -- cycle;
+    \fill[orange!10]                                         % S_3 (lower left)
+      (-1.75,-0.1)
+      -- plot[domain=-0.1:-1.7, samples=150, smooth]
+           ({0.55-0.85*cos(171.9*\x)},{\x})
+      -- (-1.75,-1.7) -- cycle;
+
+    % ---- coverage blankets: union of the eps-balls per class ----------
+    % (transparency group per class => each class gets ONE uniform tint)
+    \begin{scope}[transparency group, opacity=0.2]
+      \fill[epsGreen] (x1) circle (1.0);
+      \fill[epsGreen] (x2) circle (1.0);
+    \end{scope}
+    \begin{scope}[transparency group, opacity=0.2]
+      \fill[epsOrange] (x3) circle (1.0);
+    \end{scope}
+
+    % ---- class boundaries ----------------------------------------------
+    \draw[classLine]
+      plot[domain=-1.7:1.7, samples=250, smooth]
+        ({0.55-0.85*cos(171.9*\x)},{\x});
+    \draw[classLine] (-1.75,-0.1) -- (-0.26,-0.1);
+
+    % ---- highlighted epsilon-balls ----------------------------------------
+    \draw[ballS2] (x1) circle (1.0);
+    \draw[ballS2] (x2) circle (1.0);
+    \draw[ballS3] (x3) circle (1.0);
+
+    % ---- mu-ball around x (mu > eps) --------------------------------------
+    \draw[muBlue, very thick] (x) circle (1.1);
+
+    % ---- points --------------------------------------------------------------
+    \node[dotS1] at (x)  {};
+    \node[dotS2] at (x1) {};
+    \node[dotS2] at (x2) {};
+    \node[dotS3] at (x3) {};
+
+    % ---- radius annotations -----------------------------------------------------
+    \draw[radArrow] (x)  -- ($(x)+(250:1.1)$)  node[midway, left]        {$\mu$};
+    \draw[radArrow] (x1) -- ($(x1)+(60:1.0)$)  node[midway, above right] {$\epsilon$};
+    \draw[radArrow] (x2) -- ($(x2)+(150:1.0)$) node[midway, above left] {$\epsilon$};
+    \draw[radArrow] (x3) -- ($(x3)+(300:1.0)$) node[midway, below right] {$\epsilon$};
+
+    % ---- point labels ----------------------------------------------------------------
+    \node[below right=0pt]  at (x)  {$x$};
+    \node[above right=1pt]  at (x1) {$x_1$};
+    \node[left=2pt]         at (x2) {$x_2$};
+    \node[below right=1pt]  at (x3) {$x_3$};
+
+    % ---- region labels --------------------------------------------------------------------
+    \node[font=\small] at (-1.5, 1.45) {$S_2$};  % upper left
+    \node[font=\small] at (-1.5,-1.3)  {$S_3$};  % lower left
+    \node[font=\small] at ( 1.25, 1.45) {$S_1$}; % right
+  \end{tikzpicture}
+  \caption{Illustrated violation of $(\mu,\epsilon)$-robustness though covering condition (2.) of Theorem~\ref{thm:separability}: the $\mu$-ball of $x \in S_1$ is fully covered by three $\epsilon$-balls of $x_1, x_2 \in S_2$ and $x_3 \in S_3$.}
+  \label{fig:covering}
+\end{figure}
+
+The condition (2.) in Theorem~\ref{thm:separability} can be stated as: no $\mu$-neighbourhood is covered by $\epsilon$-neighbourhoods of points with a different label. An example when it is not the case is illustrated in Figure~\ref{fig:covering}. As $(\mu, \epsilon)$-robustness is a generalization of $\epsilon$-robustness, our proof is also a formalization of separability for $\epsilon$-robustness. For $\mu = 0$, the condition (2.) reduces to each point (0-neighbourhood) being $\epsilon$-far from any point with a different label. Separability is established here in a general, non-probabilistic setting without distributional assumptions. Unlike prior work, we show that separability is a \emph{necessary} condition for global robustness. 
+
+The characterization of robustness from Theorem~\ref{thm:separability} is central to future results and we will use it as a primary criterion of partition robustness.
+

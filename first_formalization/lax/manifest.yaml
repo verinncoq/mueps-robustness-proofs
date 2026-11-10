@@ -1,0 +1,34 @@
+specVersion: "1"
+id: lax-544225
+leanVersion: "v4.33.0"
+mathlibVersion: "db584cd6d46c92f209a44c0f1c829460d327499d"
+title: "(μ,ε)-Robustness: Characterization, Existence, and Precision-Dependent Bounds"
+unlisted: true
+authors:
+  - name: Clemens Kuske
+    github: clemenskuske
+  - name: Codex (OpenAI)
+bibEntries:
+  - |
+    @unpublished{aleksandrovVoellinger2027relaxing,
+      title = {$(\mu,\epsilon)$-Robustness: Characterization, Existence, and Precision-Dependent Bounds},
+      author = {Aleksandrov, Andrei and Kuske, Clemens and Völlinger, Kim},
+      year = {2027},
+      note = {Revised FSEN 2027 manuscript and TeX sources, received 9 November 2026}
+    }
+  - |
+    @software{aleksandrovVoellinger2026robustnessproofs,
+      title = {Rocq and Python examples for semimetric robustness},
+      author = {Aleksandrov, Andrei and Völlinger, Kim},
+      year = {2026},
+      url = {https://github.com/verinncoq/mueps-robustness-proofs},
+      note = {Reference commit d0d81caa28f9ffd166ffd245510c99b0db1c2962}
+    }
+issue:
+  repositoryId: 1320232165
+  number: 193
+paper:
+  folder: paper
+  main: main.tex
+  engine: pdflatex
+  web: false

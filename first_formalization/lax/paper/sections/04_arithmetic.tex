@@ -1,0 +1,63 @@
+\section{Modeling Finite Precision Arithmetic}
+\label{sec:modeling-arithmetic}
+
+To bridge theory and practice, we want to formulate our results on a structure that exists under computer arithmetic constraints. Modeling classifiers over real numbers can lead to a mismatch between theoretical insights and practical implementations. For example, verifiers for neural networks based on real arithmetic can be unsound when applied to floating-point computations~\cite{jia2021exploiting,cordeiro2025neural}.
+
+\paragraph{Mathematical Model.} Floating point numbers approximate real values with finite precision according to the IEEE 754 standard, which defines a finite arithmetic over a set of bitvector-encoded numbers.
+Reasoning about finite-precision arithmetic with standard operators (such as addition) is challenging, since these operators may violate familiar algebraic properties like associativity~\cite{Kneusel2025}. 
+An additional problem is presented by special floating point values such as \texttt{NaN} or \texttt{Inf}.
+Nevertheless, the IEEE 754-2008 standard provides a well-defined total ordering on floating-point numbers~\cite{4610935}, implemented, for example, in Rust\footnote{\url{https://doc.rust-lang.org/std/primitive.f64.html\#method.total\_cmp}}. This motivates the formulation of our results on ordered spaces $(S, <, d)$.
+
+However, an introduction of an order will not lead to more productive results unless a relationship between the order and the distance exists. To fix this, we introduce a new inequality. The inequality states that visiting an intermediate point between two points in the order produces at most the direct distance. In some sense, it is the opposite of a triangle inequality, which states that visiting an additional point increases the distance. But, as our goal in further proofs is to bound the size of balls, we found this inequality more productive.
+
+With these considerations, we arrive at our mathematical model standing for computer arithmetic spaces:
+% lax begin Lax544225.OrderedSemimetric
+\begin{definition}[Ordered Semimetric Space]
+    \label{def:ordered-space}
+    A tuple $(S, <, d)$ with a set $S$, a (partial) order $< \subseteq S \times S$, and $d: S \times S \rightarrow \mathbb{R}_{\geq 0}$ is an \emph{ordered semimetric space} if $(S, d)$ is a semimetric space and for all $a,b,c \in S$ such that $a \leq b \leq c$ implies $d(a, c) \geq d(a, b) + d(b,c)$.
+\end{definition}
+% lax end
+
+For example, $(\mathbb{R},\le, d)$ is an ordered semimetric space for $d(x,y) = |x - y|$ and $d(x,y) = (x - y)^2$. Note that with the second distance, $\mathbb{R}$ does not form a metric space.
+
+% lax begin Lax544225Proofs.FloatEmbedding.floatAbsoluteSpace
+\paragraph{Model Validation.} After defining ordered semimetric spaces, the question remains whether such spaces indeed exist on floating point numbers and can resemble common distances.
+% lax end
+ To verify this, we employed autonomous AI-driven proof engineering using Mistral Vibe and GLM-5.3. 
+% lax begin Lax544225Proofs.listSpaces
+We prompted it to generate provably correct instances of ordered semimetric spaces with respect to the IEEE 754 total order on lists of Flocq~\cite{boldo2011flocq} floating point numbers within the Rocq proof assistant~\cite{rocq},
+% lax end
+ re-implement the resulting distances for Python  64 bit \texttt{float} and produce a script for differential testing between Rocq and Python using fixed edge cases and randomly generated instances. The AI assistant generated the artifacts with minimal human intervention. The output was reviewed by humans later and is available on GitHub\footnote{\url{https://github.com/verinncoq/mueps-robustness-proofs/tree/main/flocq_ordered_spaces}} for further independent inspection. The following proposition summarizes the ordered semimetric constructions identified through this AI-assisted model validation process.
+
+\begin{proposition} 
+\label{prop:fp-space}
+% lax begin Lax544225.BinaryFloats
+Let $\mathcal{F}$ be a binary floating point format with $p \in \mathbb{N}$ being the number of mantissa bits. Then, it consists of triples $(s, c, m)$ representing numbers $(-1)^s \cdot 2^c \cdot m$ such that $s \in \{0,1\}$, $c \in \{c_{\min},\dots, c_{\max}\} \subset \mathbb{Z}$, $m \in \{k \cdot 2^{-p} : k \in \{1, \dots, 2^{p+1}-1\} \subset \mathbb{Z}\}$ together with additional values $\pm0$, \texttt{NaN}, $\pm$\texttt{Inf} $\in \mathcal{F}$. For each $(s, c, m) \in \mathcal{F}$ holds either $m \geq 1$ (normal) or $c = c_{\min}$ (subnormal). Let $\phi : \mathcal{F} \rightarrow \mathbb{R}$ with:
+\begin{itemize}
+    \item $\phi((s,c,m)) = (-1)^s \cdot 2^c \cdot m$ 
+    \item $\phi(+0) = 0$ and $\phi(-0) = -2^{c_{\min} - p - 1}$
+    \item $\phi(\texttt{NaN}) = 2^{c_{\max} + 1}  + 1$
+    \item $\phi(\pm\texttt{Inf}) = \pm 2^{c_{\max} + 1}$
+\end{itemize}
+% lax end
+Then, the following are ordered semimetric spaces:
+\begin{enumerate}
+% lax begin Lax544225.FloatAbsoluteSpace
+    \item $(\mathcal{F}, <_{IEEE}, d_1)$ where $<_{IEEE}$ is the IEEE total order and $d_1(f_1, f_2) = |\phi(f_1) - \phi(f_2)|$.
+% lax end
+% lax begin Lax544225.FloatSquaredSpace
+    \item $(\mathcal{F}, <_{IEEE}, d_2)$ where $d_2(f_1, f_2) = (\phi(f_1) - \phi(f_2))^2$.
+% lax end
+% lax begin Lax544225.SumProductSpace
+    \item $(\mathcal{F}^n, <^n, d_3(f, g) := \sum_{i \in [n]} d(f_i, g_i))$ such that $(\mathcal{F}, <, d)$ is an ordered semimetric space and $<^n$ is n-wise product partial order.
+% lax end
+% lax begin Lax544225.MaximumProductSpace
+    \item $(\mathcal{F}^n, <^{n}_*, d_4(f, g) := \max_{i \in [n]}d(f_i, g_i))$ where $(\mathcal{F},<,d)$ is an ordered semimetric space such that for all $a,b,c\in\mathcal{F}$ with $a \leq b \leq c$ holds that $d(a,c) = d(a,b) + d(b,c)$ and $<^n_* := \{(f,g) \in \mathcal{F}^n \times \mathcal{F}^n\,|f <^n g \wedge \forall i,j \in [n]\, d(f_i, g_i) = d(f_j, g_j)\,\}$.
+% lax end
+% lax begin Lax544225.ListSpaces
+    \item Extensions of (3) and (4) to arbitrary finite lists of floating-point numbers where a shorter list is padded with \texttt{NaN} for distance computation, and a penalty equal to $1$ is added to the distance whenever list lengths are different. The partial orders compare only lists of the same length, and lists of different lengths are incomparable.
+% lax end
+\end{enumerate}
+\end{proposition}
+
+Note that Proposition~\ref{prop:fp-space} was verified for the second time in Lean as a part of the AI-assisted formalization. The combinations of spaces 1 and 3, 1 and 4 in Proposition~\ref{prop:fp-space} give us notions similar to $l_1$, $l_\infty$ distances, respectively. Overall, we showed that ordered semimetric spaces can be faithfully constructed on floating point numbers, showing that the results proven in the following sections are transferrable to computer arithmetic.

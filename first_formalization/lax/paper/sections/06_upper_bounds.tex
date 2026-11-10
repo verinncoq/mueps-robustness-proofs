@@ -1,0 +1,138 @@
+\section{Precision-Related Upper Bounds}
+\label{sec:upper-bounds}
+
+An interesting empirically supported fact for $\epsilon$-robustness is that quantization, a process of reducing numerical precision of classifier's inputs and parameters, causes classifier to become more robust~\cite{xiao2023robustmq,shrestha2024properties,duncan2020relative}. The explanation is simple: larger distances between input space points raises the threshold on admissible $\epsilon$-values and thereby makes $\epsilon$-robustness easier to satisfy. Mathematically, one can show that with larger gaps, the maximum $\epsilon$ for nontrivial robust partitions increases. In this section, our goal is to derive such upper bounds on $\mu$ and $\epsilon$ based on precision measures: in Section~\ref{subsec:bounds-total} for totally ordered semimetric spaces and in Section~\ref{subsec:bounds-partial} for general partial orders such as multidimensional inputs common to classifiers such as neural networks.
+
+\subsection{Upper Bounds on Totally Ordered Spaces}
+\label{subsec:bounds-total}
+
+We start with upper bounds on totally ordered semimetric spaces introduced in Section~\ref{subsec:existence-order}. To state our results, we define characteristics of distances between two distinct representable numbers in an order representing finite-precision arithmetic. For a totally ordered semimetric space $(S,<,d)$, $a, b \in S$ with $a \leq b$, define an \textit{interval} $[a, b] := \{a \leq x \leq b\,|\,x \in S\}$.
+% lax begin Lax544225.PrecisionGaps
+\begin{definition}[Precision Gap Metrics]
+\label{def:precision_gap}
+    Let $(S, <, d)$ be a finite totally ordered semimetric space with $|S| \geq 2$. We define the metrics $\Delta$ and $\delta$ as:
+    \begin{align*}
+        \Delta &:= \max(\{\frac{d(x,y)}{|[x,y]| -1}\,|\,x, y \in S \wedge x < y\}) \\
+        \delta &:= \max(\{\frac{|[x,y]| - 1}{d(x,y)}\,|\,x, y \in S \wedge x < y\})
+    \end{align*}
+    where $|\cdot|$ is set cardinality.
+\end{definition}
+% lax end
+For floating-point numbers when $d(x,y) = |x - y|$ is used as the distance, $\Delta$ corresponds to the maximal and $\delta$ to the reciprocal of minimal \emph{unit in the last place} (ULP)~\cite{deDinechin2024}. Now, we show how $\Delta$ and $\delta$ define maximum possible $\mu$ and $\epsilon$ for nontrivial robust partitions.
+% lax begin Lax544225.SuccessorCovering
+\begin{theorem}
+\label{thm:bounds-total}
+    Let $(S, <, d)$ a finite totally ordered semimetric space and $\mu \geq 0, \epsilon > 0$. If $\epsilon \geq \Delta \cdot \delta \cdot \mu + \Delta$ then for all $x, x' \in S$ with $Succ(x,x')$, it holds that $B(x, \mu) \subseteq B(x', \epsilon)$. 
+\end{theorem}
+% lax end
+\begin{proof}
+    First, observe that $B(x, \mu) \subseteq B(x', \epsilon)$ can be restated as: for all $x^* \in S$ with $d(x^*,x) \leq \mu$ holds $d(x^*,x') \leq \epsilon$. Now, fix any $x^*, x, x' \in S$ with $Succ(x,x')$. If $x^* = x$ then $d(x^*, x') = d(x, x') \leq \Delta \leq \epsilon$. If $x^* = x'$, $d(x^*, x') = 0 \leq \epsilon$. We are left with two cases:
+    \begin{itemize}
+        \item \textit{1. Case: $x^* < x < x'$}: 
+                    \begin{align*}
+                        d(x^*,x') = & \frac{d(x^*,x')}{|[x^*,x']| - 1} \cdot (|[x^*, x']| - 1) \leq \Delta \cdot (|[x^*, x']| - 1) = \\
+                                 & \Delta \cdot |[x^*,x]| = \Delta \cdot (|[x^*,x]| - 1) + \Delta = \\
+                                 & \Delta \cdot \frac{|[x^*,x]| - 1}{d(x^*,x)} \cdot d(x^*,x) + \Delta \leq \Delta \cdot \delta \cdot d(x^*,x) + \Delta \leq \\
+                                 & \Delta \cdot \delta \cdot \mu + \Delta \leq \epsilon
+                    \end{align*}
+        \item \textit{2. Case: $x < x' < x^*$}:
+                    \begin{align*}
+                        d(x^*, x') = &d(x', x^*) \leq d(x, x^*) \\
+                                    & \leq \mu = \frac{d(x,x')}{d(x,x')} \cdot \mu \leq \Delta \cdot \delta \cdot \mu < \epsilon
+                    \end{align*}
+    \end{itemize}
+    \qed
+\end{proof}
+% lax begin Lax544225.PrecisionObstruction
+\begin{corollary}
+\label{cor:bounds-total}
+    Let $(S, <, d)$ a finite totally ordered semimetric space and $\mu \geq 0, \epsilon > 0$. If $\epsilon \geq \Delta \cdot \delta \cdot \mu + \Delta$ then the only $(\mu, \epsilon)$-robust partition is trivial. 
+\end{corollary}
+% lax end
+\begin{proof}
+   We show that conclusion of the Theorem~\ref{thm:bounds-total} implies condition (2.) of Theorem~\ref{thm:existence-total}. 
+   Fix a nonempty $S' \subset S$. 
+   Let $x_{min} := min(S \setminus S')$ and $x'_{min} := min(S')$.
+   Since neither $S \setminus S'$ nor $S'$ are empty, both $x_{min}$ and $x'_{min}$ exist.
+   \begin{itemize}
+       \item \textit{1. Case: $x_{min} < x'_{min}$.}
+                   Let $x_{pre} := max(\{x \in S \setminus S'\,|\, x < x'_{min}\})$ and $x'_{succ} := x'_{min}$.
+                   As $Succ(x_{pre}, x'_{succ})$ holds, $B(x_{pre}, \mu) \subseteq B(x'_{succ}, \epsilon)$ by Theorem~\ref{thm:bounds-total}. 
+                   Observe that $x'_{succ} \in \partial S'$. 
+                   Condition (2.) of Theorem~\ref{thm:existence-total} holds as $x_{pre} \in S \setminus S'$ and $(B(x_{pre}, \mu) \cap S \setminus S') \subseteq B(x_{pre}, \mu) \subseteq B(x'_{succ}, \epsilon) \subseteq \bigcup_{x' \in \partial S'} B(x', \epsilon)$.
+        \item \textit{2. Case: $x_{min} > x'_{min}$.}
+                   Let $x'_{pre} := max(\{x' \in S'| x' < x_{min}\})$ and $x_{succ} := x_{min}$, then $Succ(x'_{pre}, x_{succ})$. 
+                   Similarly to the 1. Case, $(B(x'_{pre}, \mu) \cap S') \subseteq B(x'_{pre}, \mu) \subseteq B(x_{succ}, \epsilon) \subseteq \bigcup_{x' \in \overline{\partial} S'} B(x', \epsilon)$.
+   \end{itemize}
+   Corollary~\ref{cor:existence-total} states that condition (2.) is equivalent to $(S,<,d)$ having the trivial partition as the only $(\mu, \epsilon)$-robust partition.
+\end{proof}
+
+For $\epsilon$-robustness ($\mu=0$), we see that $\epsilon \geq \Delta$ is an upper bound for a nontrivial robust partition. With increasing $\Delta$, this bound also increases which provides theoretical evidence for better robustness after quantization. Introduction of a new parameter $\mu$ allows to relax strong restrictions imposed by $\epsilon$ on partitions, which is the goal of having a weaker version of robustness. 
+
+\subsection{Upper Bounds on Partial Orders}
+\label{subsec:bounds-partial}
+
+Usually, classifiers are not defined on a single floating-point number line but on multi-dimensional vectors that potentially consist of numbers with different precision (e.g. integers and floats). The total order given by an arithmetic over each vector dimension creates a partial order over the entire vector space. This multi-dimensional setting demands an extended result on the achievable robustness of a classifier. Unfortunately, $(\mu,\epsilon)$-robustness shows non-compositional behavior which we want to illustrate with a lemma:
+% lax begin Lax544225.Noncompositionality
+\begin{lemma}
+\label{lem:noncompositional}
+Given a semimetric space $(S, d)$ let $S_1, S_2 \subset S$ with $S_1 \cap S_2 \neq \emptyset$ as well as $\mu \geq 0, \epsilon > 0$. The following statements are \textbf{false}:
+\begin{enumerate}
+    \item If the only $(\mu, \epsilon)$-robust partition on $S_1$ is trivial, all $(\mu, \epsilon)$-robust partitions $P$ on $S$ include a superset of $S_1$.
+    \item If the only $(\mu, \epsilon)$-robust partitions on $S_1$ and $S_2$ trivial, the only $(\mu, \epsilon)$-robust partition on $S_1 \cup S_2$ is trivial.
+\end{enumerate}
+\end{lemma}
+% lax end
+\begin{proof}
+We provide counterexamples for $S := \{a,b,c,d\}$ with $d(a,b) = d(b,c) = d(c,d) = 1$, $d(a,c) = d(b,d) = 2$ and $d(a,d) = 3$. Note that $S$ has a nontrivial robust partition for $\mu = \epsilon = 1$: $\{\{a,b\},\{c,d\}\}$.
+\begin{enumerate}
+    \item $S_1 = \{b,c\}$ does not have a nontrivial robust partition for $\mu = \epsilon = 1$, and the nontrivial robust partition on $S$ does not contain a superset of $S_1$.
+    \item $S_1 = \{a,b,c\}$ and $S_2 = \{b,c,d\}$ do not have a nontrivial robust partition for $\mu = \epsilon = 1$, but $S$ does.
+\end{enumerate}
+\qed
+\end{proof}
+
+Still, it is possible to find a general but relatively weak decomposition principle. First, we define how the decomposing structure looks like:
+% lax begin Lax544225.Decomposition
+\begin{definition}[$(\mu, \epsilon)$-Decomposition]
+    \label{def:decomposition}
+    A collection of nonempty sets $D := \{D_1,\dots,D_p\}$ is a $(\mu, \epsilon)$-decomposition of a semimetric space $(S, d)$ iff
+    \begin{enumerate}
+        \item for each $x \in D_i$, $B(x, \mu) \subseteq D_i$ and
+        \item for each $x_1, x_2 \in S$, there is a sequence of sets $D_{i_1},\dots,D_{i_n} \in D$ such that $D_{i_{j}} \cap D_{i_{j+1}} \neq \emptyset$ and $x_1 \in D_{i_1}$, $x_2 \in D_{i_n}$. 
+    \end{enumerate} 
+\end{definition}
+% lax end
+
+Now, we are ready to show that $(\mu, \epsilon)$-decompositions allow us to focus on considering $(\mu, \epsilon)$-robustness of individual decomposition elements only.
+
+% lax begin Lax544225.DecompositionObstruction
+\begin{theorem}
+\label{thm:decomposition}
+    Given a semimetric space $(S, d)$ with $\mu \geq 0, \epsilon > 0$, let $D$ be a $(\mu, \epsilon)$-decomposition of $S$. If, each $D_i \in D$ has the trivial partition as its only $(\mu, \epsilon)$-robust partition then the only $(\mu, \epsilon)$-robust partition on $S$ is trivial.
+\end{theorem}
+% lax end
+\begin{proof}   
+    We prove the condition (2.) from Theorem~\ref{thm:existence} directly in two steps. Pick a nonempty $S' \subset S$. In the first step, we rule out existence of some $S'$ and in the second, construct the witness $x \in S$ that satisfies Theorem~\ref{thm:existence} (2.).
+    
+    (\emph{Step 1}): 
+    First, we prove that there exists $D_i \in D$ such that both $D_i \cap S'$ and $D_i \cap (S \setminus S')$ are nonempty. For contradiction, assume that $D_i \cap S' = \emptyset$ or $D_i \cap (S \setminus S') = \emptyset$ for all $D_i \in D$. As $S'$ is a proper nonempty subset, there are $x' \in S'$ and $x^* \in S \setminus S'$. Using property (2.) from Definition~\ref{def:decomposition}, construct a sequence $D_{i_1}, \dots, D_{i_p}$ out of elements in $D$ with $x' \in D_{i_1}$ and $x^* \in D_{i_p}$. As $D_{i_1} \subseteq S'$ and $D_{i_p} \cap S' = \emptyset$ by assumption of this step, there is a consecutive pair $D_{i_j}, D_{i_{j + 1}}$  with $j \in [p]$ in the sequence such that $D_{i_j} \cap S' = D_{i_j}$ and $D_{i_{j + 1}} \cap S' = \emptyset$. But, by property (2.) of Definition~\ref{def:decomposition}, $D_{i_j} \cap D_{i_{j + 1}} \neq \emptyset$, leading to contradiction: $\emptyset \neq D_{i_j} \cap D_{i_{j + 1}} = (D_{i_j} \cap S') \cap D_{i_{j + 1}} = D_{i_j} \cap (S' \cap D_{i_{j + 1}}) = \emptyset$.
+
+    (\emph{Step 2}): 
+    We construct the witness $x \in S$ in this step. Per Step 1, pick $D_i$ with $D_i \cap S'$ and $D_i \cap (S \setminus S')$ being both nonempty. Then, as $D_i$ does not have nontrivial robust partitions by theorem assumption, by Theorem~\ref{thm:existence}, there exists $x \in D_i$ such that either $x \in D_i \cap S'$ and $(B(x,\mu) \cap D_i) \subseteq \bigcup_{x' \in D_i \setminus S'} (B(x', \epsilon) \cap D_i)$ or $x \in D_i \cap (S \setminus S')$ with $(B(x,\mu) \cap D_i) \subseteq \bigcup_{x' \in D_i \cap S'} (B(x', \epsilon) \cap D_i)$. We pick $x$ as the witness for our proof. If $x \in S'$ then by property (1.) of Definition~\ref{def:decomposition}, $(B(x,\mu) \cap D_i) = B(x, \mu) \subseteq \bigcup_{x' \in D_i \setminus S'} (B(x', \epsilon) \cap D_i) \subseteq \bigcup_{x' \in S \setminus S'} B(x', \epsilon)$. Similarly if $x \in S \setminus S'$, $(B(x,\mu) \cap D_i) = B(x, \mu) \subseteq \bigcup_{x' \in D_i \cap S'} (B(x', \epsilon) \cap D_i) \subseteq \bigcup_{x' \in S'} B(x', \epsilon)$ . As in both cases, condition (2.) from Theorem~\ref{thm:existence} is proven, and $S$ does not have a nontrivial robust partition in this case.
+    \qed
+\end{proof}
+
+We specialize the result from Theorem~\ref{thm:decomposition} to ordered semimetric spaces.
+
+% lax begin Lax544225.PartialOrderPrecisionBound
+\begin{corollary}
+    \label{cor:bounds-posets}
+    Let $(S, <, d)$ a finite partially ordered semimetric space with $|S| \geq 2$ and $\mu \geq 0, \epsilon > 0$. Let $D := \{D_1, \dots, D_n\}$ be a $(\mu, \epsilon)$-decomposition of $S$ such that all $D_i \in D$ form a totally ordered semimetric space $(D_i, <, d)$ with corresponding $\Delta_i, \delta_i$. If $\epsilon \geq \max_{i \in [n]}(\Delta_i \cdot \delta_i \cdot \mu + \Delta_i)$ then the only $(\mu, \epsilon)$-robust partition of $S$ is trivial.
+\end{corollary}
+% lax end
+\begin{proof}
+    First, observe that each $D_i \in D$ does not have a nontrivial $(\mu, \epsilon)$-robust partition by Corollary~\ref{cor:bounds-total}. This implies by Theorem~\ref{thm:decomposition} that every $(\mu, \epsilon)$-robust partition on $S$ is trivial.
+\end{proof}
+
+Corollary~\ref{cor:bounds-posets} presents an upper bound for any partially ordered set that has a $(\mu,\epsilon)$-decomposition. Despite our motivation, a general product order does not necessarily admit such decomposition. This means that the Corollary does not easily generalize to vectors of finite precision numbers.
