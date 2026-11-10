@@ -92,8 +92,7 @@ so the common-ball lemma forces triviality. The pair is in neither global part.
 
 # Attribution
 
-Lemma 1.1 of Aleksandrov and Völlinger, *Relaxing Global Classifier Robustness
-on Semimetric Spaces*, supplied FSEN 2027 manuscript, p. 13.
+Lemma 1.1 of Aleksandrov, Kuske and Völlinger, *(μ,ε)-Robustness: Characterization, Existence, and Precision-Dependent Bounds*, revised FSEN 2027 manuscript (9 November 2026).
 -/
 lemma restrictionCounterexample : ∃ (d : Distance (Fin 4)) (hd : IsSemimetric d)
     (P : Set (Set (Fin 4))) (hP : IsPartition P) (A : Set (Fin 4)),
@@ -134,8 +133,7 @@ triple and verify their overlap and union directly.
 
 # Attribution
 
-Lemma 1.2 of Aleksandrov and Völlinger, *Relaxing Global Classifier Robustness
-on Semimetric Spaces*, supplied FSEN 2027 manuscript, p. 13.
+Lemma 1.2 of Aleksandrov, Kuske and Völlinger, *(μ,ε)-Robustness: Characterization, Existence, and Precision-Dependent Bounds*, revised FSEN 2027 manuscript (9 November 2026).
 -/
 lemma unionCounterexample : ∃ (d : Distance (Fin 4)) (hd : IsSemimetric d)
     (A B : Set (Fin 4)) (P : Set (Set (Fin 4))) (hP : IsPartition P),
@@ -182,7 +180,7 @@ criterion; their subsets witness the two failures separately.
 
 # Attribution
 
-Lemma 1 of Aleksandrov and Völlinger's supplied FSEN 2027 manuscript, p. 13.
+Lemma 1 of Aleksandrov, Kuske and Völlinger's revised FSEN 2027 manuscript (9 November 2026).
 -/
 lemma noncompositionality :
     (∃ (d : Distance (Fin 4)) (hd : IsSemimetric d)

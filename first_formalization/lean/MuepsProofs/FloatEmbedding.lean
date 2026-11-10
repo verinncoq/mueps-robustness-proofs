@@ -294,6 +294,15 @@ lemma floatAbsoluteAdditivity (F : Format) : Additive (absDistance F) (ieeeLe F)
 /--
 Absolute embedded distance forms an ordered semimetric.
 
+**Lean statements for Model Validation**
+
+The Lean counterparts of the supplied Rocq/Flocq model include:
+
+- [`format_finite_value`](https://github.com/clemenskuske/semimetric-robustness-lax-submission/blob/6a0ab4b1b173c95435637d859b8fb1c698647781/proofs/Lax544225Proofs/FlocqBridge.lean#L114): the Flocq parameter conversion preserves finite values.
+- [`phiQ_cast`](https://github.com/clemenskuske/semimetric-robustness-lax-submission/blob/6a0ab4b1b173c95435637d859b8fb1c698647781/proofs/Lax544225Proofs/FlocqBridge.lean#L79): the rational embedding agrees with the real embedding.
+- [`ieeeLe_iff_phiQ_le`](https://github.com/clemenskuske/semimetric-robustness-lax-submission/blob/6a0ab4b1b173c95435637d859b8fb1c698647781/proofs/Lax544225Proofs/FlocqBridge.lean#L95): IEEE order agrees with rational comparison.
+- [`squareDistQ_strict_antitriangle`](https://github.com/clemenskuske/semimetric-robustness-lax-submission/blob/6a0ab4b1b173c95435637d859b8fb1c698647781/proofs/Lax544225Proofs/FlocqBridge.lean#L150): squared distance is strictly superadditive along nondegenerate increasing chains.
+
 # Proof strategy
 
 Injectivity of φ gives distance-zero separation, and absolute differences are

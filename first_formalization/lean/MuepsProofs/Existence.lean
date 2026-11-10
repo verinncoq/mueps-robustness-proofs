@@ -54,8 +54,7 @@ uncovered-to-robust characterization and contradict its forced triviality.
 
 # Attribution
 
-Theorem 2 of Aleksandrov and Völlinger, *Relaxing Global Classifier Robustness
-on Semimetric Spaces*, supplied FSEN 2027 manuscript, p. 9.
+Theorem 2 of Aleksandrov, Kuske and Völlinger, *(μ,ε)-Robustness: Characterization, Existence, and Precision-Dependent Bounds*, revised FSEN 2027 manuscript (9 November 2026).
 -/
 lemma trivialityToCutCovering {S : Type u} (d : Distance S) (hd : IsSemimetric d)
     (μ ε : ℝ≥0) (hε : 0 < ε) :
@@ -92,8 +91,7 @@ covering point. Thus every part is the whole carrier.
 
 # Attribution
 
-Theorem 2 of Aleksandrov and Völlinger, *Relaxing Global Classifier Robustness
-on Semimetric Spaces*, supplied FSEN 2027 manuscript, p. 9.
+Theorem 2 of Aleksandrov, Kuske and Völlinger, *(μ,ε)-Robustness: Characterization, Existence, and Precision-Dependent Bounds*, revised FSEN 2027 manuscript (9 November 2026).
 -/
 lemma cutCoveringToTriviality {S : Type u} (d : Distance S) (hd : IsSemimetric d)
     (μ ε : ℝ≥0) (hε : 0 < ε) :

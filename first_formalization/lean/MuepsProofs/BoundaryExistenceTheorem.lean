@@ -22,8 +22,7 @@ boundary characterization converts cut covering to boundary covering.
 
 # Attribution
 
-Corollary 1 of Aleksandrov and Völlinger, *Relaxing Global Classifier Robustness
-on Semimetric Spaces*, supplied FSEN 2027 manuscript, pp. 10–11.
+Corollary 1 of Aleksandrov, Kuske and Völlinger, *(μ,ε)-Robustness: Characterization, Existence, and Precision-Dependent Bounds*, revised FSEN 2027 manuscript (9 November 2026).
 -/
 lemma boundaryExistence {S : Type u} [Finite S] [LinearOrder S]
     (d : Distance S) (hd : IsOrdered d (· ≤ ·)) (μ ε : ℝ≥0) (hε : 0 < ε) :

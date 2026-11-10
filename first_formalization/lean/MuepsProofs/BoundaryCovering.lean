@@ -4,6 +4,7 @@
 
 import Mueps.Definitions
 import MuepsProofs.CoveringConditions
+import MuepsProofs.Basic
 import Mathlib.Data.Set.Finite.Lemmas
 import Mathlib.Tactic
 
@@ -13,9 +14,6 @@ namespace MuepsProofs.OrderedBounds
 
 open scoped NNReal
 open Mueps Semimetric OrderedSemimetric Balls CoveringConditions Boundary PrecisionGaps
-
-lemma distance_self {S : Type u} {d : Distance S} (hd : IsSemimetric d) (x : S) :
-    d x x = 0 := (hd.2.1 x x).2 rfl
 
 /-- The standard cover relation is the paper's strict no-between successor relation. -/
 lemma successor_iff {S : Type u} [LinearOrder S] (x y : S) :
@@ -66,7 +64,7 @@ Find a consecutive crossing between each covered point and its opposite-side cen
 The ordered antitriangle inequality makes the boundary center no farther away.
 
 # Attribution
-Aleksandrov and Völlinger, Theorem 3, forward direction.
+Aleksandrov, Kuske and Völlinger, Theorem 3, forward direction.
 -/
 lemma cutToBoundaryCovering {S : Type u} [Finite S] [LinearOrder S] (d : Distance S)
     (hd : IsOrdered d (· ≤ ·)) (μ ε : ℝ≥0) (_hε : 0 < ε) :
@@ -92,7 +90,7 @@ Points on the center's side use the given boundary covering. Opposite-side point
 belong to their own closed epsilon-ball because their self-distance is zero.
 
 # Attribution
-Aleksandrov and Völlinger, Theorem 3, reverse direction.
+Aleksandrov, Kuske and Völlinger, Theorem 3, reverse direction.
 -/
 lemma boundaryToCutCovering {S : Type u} [Finite S] [LinearOrder S] (d : Distance S)
     (hd : IsOrdered d (· ≤ ·)) (μ ε : ℝ≥0) (_hε : 0 < ε) :
@@ -105,11 +103,11 @@ lemma boundaryToCutCovering {S : Type u} [Finite S] [LinearOrder S] (d : Distanc
     by_cases hyA : y ∈ A
     · obtain ⟨z, hz, hyz⟩ := hx.2 ⟨hy, hyA⟩
       exact ⟨z, hz.1, hyz⟩
-    · exact ⟨y, hyA, by simp [ball, distance_self hd.1]⟩
+    · exact ⟨y, hyA, by simp [ball, Basic.distance_self hd.1]⟩
   · refine ⟨x, Or.inr ⟨hx.1, ?_⟩⟩
     intro y hy
     by_cases hyA : y ∈ A
-    · exact ⟨y, hyA, by simp [ball, distance_self hd.1]⟩
+    · exact ⟨y, hyA, by simp [ball, Basic.distance_self hd.1]⟩
     · obtain ⟨z, hz, hyz⟩ := hx.2 ⟨hy, hyA⟩
       exact ⟨z, hz.1, hyz⟩
 

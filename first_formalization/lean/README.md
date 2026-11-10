@@ -1,11 +1,18 @@
 # Lean formalization of semimetric robustness
 
-Lean 4 formalization of Andrei Aleksandrov and Kim Völlinger's
-*Relaxing Global Classifier Robustness on Semimetric Spaces*.
+Lean 4 formalization of Andrei Aleksandrov, Clemens Kuske and Kim Völlinger's
+*(μ,ε)-Robustness: Characterization, Existence, and Precision-Dependent Bounds*
+(revised FSEN 2027 manuscript, 9 November 2026).
 
 This package contains the definitions and complete proofs for Theorems 1–5,
 Corollaries 1–3, Lemma 1 (both counterexamples), and the five constructions of
 Proposition 1. The fifth construction contains both list variants.
+
+The supporting proofs also include the real-distance examples and the Lean
+translation of the Rocq/Flocq model: exact rational embeddings, IEEE order
+correspondence, strict squared-distance inequalities, and binary64 product/list
+instances and examples. This translation proves the mathematical correspondence
+in Lean; it does not import Rocq datatypes or kernel proofs.
 
 ## Build
 
@@ -30,7 +37,7 @@ submission dependency is needed.
 - `Mueps/Paper.lean`: the paper-facing surface. Each result has its complete
   statement and a trivial proof of the form `by exact <proved result> ...`.
 - `Mueps.lean`: entry point for downstream users (`import Mueps`).
-- `CheckAxioms.lean`: checks all fourteen aliases and rejects nonstandard axioms, including admitted proofs.
+- `CheckAxioms.lean`: checks all fourteen aliases and the added Flocq and real-distance lemmas, rejecting nonstandard axioms, including admitted proofs.
 
 For example, the full proof of Theorem 1 is
 `MuepsProofs.MainResults.coveringCharacterization` in
@@ -72,9 +79,10 @@ The existing Rocq file `../formalization.v` is a separate development.
 
 ## Provenance
 
-Adapted on 18 October 2026 from the Lean formalization by Clemens Kuske and
+Originally adapted on 18 October 2026 and synchronized on 10 November 2026
+from the Lean formalization by Clemens Kuske and
 Codex (OpenAI), accepted as [lax-544225](https://laxarchive.org/lax-544225/),
-[source commit 5d812af45275f298dec0e9e4465d6a665e95656b](https://github.com/clemenskuske/semimetric-robustness-lax-submission/tree/5d812af45275f298dec0e9e4465d6a665e95656b).
+[source commit 900b50f00c2873ad4040686a9eda95507c5c4055](https://github.com/clemenskuske/semimetric-robustness-lax-submission/tree/900b50f00c2873ad4040686a9eda95507c5c4055).
 The mathematical source and theorem-specific attribution remain in the files.
 The port replaces archive statement assumptions with actual proved dependencies,
 splits modules to preserve an acyclic import graph, and adds the thin paper aliases.

@@ -23,7 +23,7 @@ Only-trivial robustness gives opposite-boundary covering.
 Compose the general existence criterion with its finite-order boundary reduction.
 
 # Attribution
-Aleksandrov and Völlinger, Corollary 1, forward direction.
+Aleksandrov, Kuske and Völlinger, Corollary 1, forward direction.
 -/
 lemma trivialityToBoundaryCovering {S : Type u} [Finite S] [LinearOrder S]
     (d : Distance S) (hd : IsOrdered d (· ≤ ·)) (μ ε : ℝ≥0) (hε : 0 < ε) :
@@ -39,7 +39,7 @@ Opposite-boundary covering excludes nontrivial robust partitions.
 Compose the boundary extension with the previously established general cut criterion.
 
 # Attribution
-Aleksandrov and Völlinger, Corollary 1, reverse direction.
+Aleksandrov, Kuske and Völlinger, Corollary 1, reverse direction.
 -/
 lemma boundaryCoveringToTriviality {S : Type u} [Finite S] [LinearOrder S]
     (d : Distance S) (hd : IsOrdered d (· ≤ ·)) (μ ε : ℝ≥0) (hε : 0 < ε) :

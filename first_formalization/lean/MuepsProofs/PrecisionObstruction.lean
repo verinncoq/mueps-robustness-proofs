@@ -25,7 +25,7 @@ ball at the lower point inside an epsilon-ball centered on the opposite boundary
 Restrict this covering to the lower point's side and apply BoundaryExistence.
 
 # Attribution
-Aleksandrov and Völlinger, Corollary 2.
+Aleksandrov, Kuske and Völlinger, Corollary 2.
 -/
 lemma precisionObstruction {S : Type u} [Finite S] [LinearOrder S] (d : Distance S)
     (hd : IsOrdered d (· ≤ ·)) (μ ε : ℝ≥0) (hε : 0 < ε)

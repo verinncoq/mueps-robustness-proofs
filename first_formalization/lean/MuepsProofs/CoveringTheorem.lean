@@ -22,8 +22,7 @@ supplies a center whose ε-ball stays within the selected part.
 
 # Attribution
 
-Theorem 1 of Aleksandrov and Völlinger, *Relaxing Global Classifier Robustness
-on Semimetric Spaces*, supplied FSEN 2027 manuscript, p. 6.
+Theorem 1 of Aleksandrov, Kuske and Völlinger, *(μ,ε)-Robustness: Characterization, Existence, and Precision-Dependent Bounds*, revised FSEN 2027 manuscript (9 November 2026).
 -/
 theorem coveringCharacterization {S : Type u} (d : Distance S)
     (hd : IsSemimetric d) (P : Set (Set S)) (hP : IsPartition P)

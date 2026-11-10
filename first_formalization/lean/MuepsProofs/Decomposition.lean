@@ -74,8 +74,7 @@ part to any input, forcing that part to be the whole carrier.
 
 # Attribution
 
-Theorem 5 of Aleksandrov and Völlinger, *Relaxing Global Classifier Robustness
-on Semimetric Spaces*, supplied FSEN 2027 manuscript, pp. 13–14.
+Theorem 5 of Aleksandrov, Kuske and Völlinger, *(μ,ε)-Robustness: Characterization, Existence, and Precision-Dependent Bounds*, revised FSEN 2027 manuscript (9 November 2026).
 -/
 theorem decompositionObstruction {S : Type u} (d : Distance S) (hd : IsSemimetric d)
     (D : Set (Set S)) (μ ε : ℝ≥0) (_hε : 0 < ε)
@@ -128,8 +127,7 @@ piece, then use the closed overlap decomposition theorem.
 
 # Attribution
 
-Corollary 3 of Aleksandrov and Völlinger, *Relaxing Global Classifier Robustness
-on Semimetric Spaces*, supplied FSEN 2027 manuscript, p. 14.
+Corollary 3 of Aleksandrov, Kuske and Völlinger, *(μ,ε)-Robustness: Characterization, Existence, and Precision-Dependent Bounds*, revised FSEN 2027 manuscript (9 November 2026).
 -/
 lemma partialOrderPrecisionBound {S : Type u} [Finite S] [PartialOrder S]
     (d : Distance S) (hd : IsOrdered d (· ≤ ·)) (D : Set (Set S))

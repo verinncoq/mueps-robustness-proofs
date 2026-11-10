@@ -15,3 +15,7 @@ import MuepsProofs.PrecisionBounds
 import MuepsProofs.PrecisionObstruction
 import MuepsProofs.Products
 import MuepsProofs.SubspaceDistance
+import MuepsProofs.FlocqBridge
+import MuepsProofs.FlocqExamples
+import MuepsProofs.FlocqStrict
+import MuepsProofs.PaperExamples

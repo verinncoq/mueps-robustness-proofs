@@ -75,7 +75,7 @@ coordinatewise. The empty product is included by the same finite-sum laws.
 
 # Attribution
 
-Proposition 1.3 of Aleksandrov and Völlinger's supplied FSEN 2027 manuscript.
+Proposition 1.3 of Aleksandrov, Kuske and Völlinger's supplied FSEN 2027 manuscript.
 -/
 lemma sumProductSpace {S : Type u} (d : Distance S) (le : S → S → Prop)
     (hd : IsOrdered d le) (n : ℕ) : IsOrdered (sumDistance d n) (productLe le n) := by
@@ -136,7 +136,7 @@ additivity; the empty product has distance zero.
 
 # Attribution
 
-Proposition 1.4 of Aleksandrov and Völlinger's supplied FSEN 2027 manuscript;
+Proposition 1.4 of Aleksandrov, Kuske and Völlinger's supplied FSEN 2027 manuscript;
 the synchronized construction is also described in the cited Rocq reference.
 -/
 lemma maximumProductSpace {S : Type u} (d : Distance S) (le : S → S → Prop)

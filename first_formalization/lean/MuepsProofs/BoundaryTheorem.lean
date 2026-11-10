@@ -23,8 +23,7 @@ coverage, opposite-side points cover themselves with their own ε-balls.
 
 # Attribution
 
-Theorem 3 of Aleksandrov and Völlinger, *Relaxing Global Classifier Robustness
-on Semimetric Spaces*, supplied FSEN 2027 manuscript, p. 10.
+Theorem 3 of Aleksandrov, Kuske and Völlinger, *(μ,ε)-Robustness: Characterization, Existence, and Precision-Dependent Bounds*, revised FSEN 2027 manuscript (9 November 2026).
 -/
 theorem boundaryCoveringCharacterization {S : Type u} [Finite S] [LinearOrder S]
     (d : Distance S) (hd : IsOrdered d (· ≤ ·)) (μ ε : ℝ≥0) (hε : 0 < ε) :

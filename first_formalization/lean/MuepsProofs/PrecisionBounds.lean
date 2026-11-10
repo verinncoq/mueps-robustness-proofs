@@ -100,7 +100,7 @@ steps by delta times distance. A successor adds exactly one interval step. On th
 other side of the successor, the ordered antitriangle inequality gives monotonicity.
 
 # Attribution
-Aleksandrov and Völlinger, Theorem 4.
+Aleksandrov, Kuske and Völlinger, Theorem 4.
 -/
 theorem successorCovering {S : Type u} [Finite S] [LinearOrder S] (d : Distance S)
     (hd : IsOrdered d (· ≤ ·)) (μ ε : ℝ≥0) (_hε : 0 < ε)

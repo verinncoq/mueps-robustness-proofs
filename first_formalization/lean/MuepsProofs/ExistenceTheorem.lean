@@ -22,8 +22,7 @@ proper part of a robust partition contradicts coverage of that cut.
 
 # Attribution
 
-Theorem 2 of Aleksandrov and Völlinger, *Relaxing Global Classifier Robustness
-on Semimetric Spaces*, supplied FSEN 2027 manuscript, p. 9.
+Theorem 2 of Aleksandrov, Kuske and Völlinger, *(μ,ε)-Robustness: Characterization, Existence, and Precision-Dependent Bounds*, revised FSEN 2027 manuscript (9 November 2026).
 -/
 theorem generalExistence {S : Type u} (d : Distance S) (hd : IsSemimetric d)
     (μ ε : ℝ≥0) (hε : 0 < ε) :
