@@ -42,11 +42,11 @@ def IsPartition {S : Type u} (P : Set (Set S)) : Prop :=
 def IsTrivial {S : Type u} (P : Set (Set S)) : Prop := P = {Set.univ}
 
 /-- The part assigned a particular classifier label. -/
-def fiber {S : Type u} {n : ℕ} (c : Classifier S n) (i : Fin n) : Set S :=
+def classSet {S : Type u} {n : ℕ} (c : Classifier S n) (i : Fin n) : Set S :=
   {x | c.label x = i}
 
-/-- The collection of all label fibers. -/
-def induced {S : Type u} {n : ℕ} (c : Classifier S n) : Set (Set S) :=
-  Set.range (fiber c)
+/-- The partition formed by all classes of the classifier. -/
+def classifierInducedPartition {S : Type u} {n : ℕ} (c : Classifier S n) : Set (Set S) :=
+  Set.range (classSet c)
 
 end Lax544225.Partitions

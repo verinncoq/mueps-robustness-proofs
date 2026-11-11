@@ -11,7 +11,7 @@ If every piece of a closed, overlapping decomposition admits only a trivial robu
 **Statement from the paper.**
 
 Let $(S,d)$ be a semimetric space with $\mu\geq0$, $\epsilon>0$, and let
-$D$ be a $(\mu,\epsilon)$-decomposition of $S$. If each $D_i\in D$ has the
+$D$ be a $\mu$-decomposition of $S$. If each $D_i\in D$ has the
 trivial partition as its only $(\mu,\epsilon)$-robust partition, then the only
 $(\mu,\epsilon)$-robust partition on $S$ is trivial.
 -/
@@ -22,12 +22,15 @@ namespace Lax544225.DecompositionObstruction
 
 open scoped NNReal
 
-open Semimetric Decomposition PartitionRobustness
+open SemimetricSpace Decomposition PartitionRobustness
 
-/-- If a semimetric space has a (μ,ε)-decomposition and each induced subspace admits only trivial (μ,ε)-robust partitions, then the whole space admits only trivial (μ,ε)-robust partitions. -/
-axiom statement {S : Type u} (d : Distance S) (hd : IsSemimetric d) (D : Set (Set S))
-    (μ ε : ℝ≥0) (hε : 0 < ε) (hD : IsDecomposition d hd D μ)
-    (hlocal : ∀ A ∈ D, ∀ hA : IsSemimetric (fun x y : A => d x.val y.val),
-      OnlyTrivial (fun x y : A => d x.val y.val) hA μ ε) : OnlyTrivial d hd μ ε
+/-- Triviality of robust partitions on each decomposition piece implies global triviality. -/
+axiom theorem5 {S : Type u} (d : Distance S) (hd : IsSemimetricSpace d)
+    (D : Set (Set S)) (μ : ℝ≥0) (ε : ℝ>0)
+    (hD : IsDecomposition d hd D μ)
+    (hlocal : ∀ Dᵢ ∈ D,
+      let dᵢ : Distance Dᵢ := fun x y => d x.val y.val
+      ∀ hDᵢ : IsSemimetricSpace dᵢ, OnlyTrivial dᵢ hDᵢ μ ε) :
+    OnlyTrivial d hd μ ε
 
 end Lax544225.DecompositionObstruction

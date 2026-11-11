@@ -15,32 +15,51 @@ $\mu\geq 0$, $\epsilon>0$, the following implications are false in general:
 
 # Formalization notes
 
-Both implications are refuted by explicit counterexamples on the four-point
-line $\{0,1,2,3\}$ with $\mu=\epsilon=1$ and partition
-$\{\{0,1\},\{2,3\}\}$. The first uses $S_1=\{1,2\}$; the unused second
-subset can be chosen equal to $S_1$. The second uses $S_1=\{0,1,2\}$ and
-$S_2=\{1,2,3\}$. The two existential clauses record these counterexamples.
+The two proposed universal implications are named `RestrictionPrinciple` and
+`UnionPrinciple`. Lemma 1 states that both are false. For the union principle,
+the ambient carrier is the union of the two subsets. `OnlyTrivialOn d hd A μ ε`
+says that the nonempty subset `A`, with the distance inherited from `d`, admits
+only trivial robust partitions. It packages the inherited semimetric certificate
+with local triviality; in particular, it is false for an empty subset. Concrete
+spaces, radii, and partitions belong to the proof.
 -/
 
 namespace Lax544225.Noncompositionality
 
-open Semimetric Partitions PartitionRobustness
+open scoped NNReal
 
-/-- Counterexamples to both compositionality implications in Lemma 1. -/
-axiom statement :
-    (∃ (d : Distance (Fin 4)) (hd : IsSemimetric d)
-      (P : Set (Set (Fin 4))) (hP : IsPartition P) (A : Set (Fin 4)),
-    Robust d hd P hP 1 1 ∧ A.Nonempty ∧ Aᶜ.Nonempty ∧
-    (∀ hA : IsSemimetric (fun x y : A => d x.val y.val),
-      OnlyTrivial (fun x y : A => d x.val y.val) hA 1 1) ∧
-    ¬ ∃ B ∈ P, A ⊆ B) ∧
-    (∃ (d : Distance (Fin 4)) (hd : IsSemimetric d)
-      (A B : Set (Fin 4)) (P : Set (Set (Fin 4))) (hP : IsPartition P),
-    Aᶜ.Nonempty ∧ Bᶜ.Nonempty ∧ (A ∩ B).Nonempty ∧ A ∪ B = Set.univ ∧
-    (∀ hA : IsSemimetric (fun x y : A => d x.val y.val),
-      OnlyTrivial (fun x y : A => d x.val y.val) hA 1 1) ∧
-    (∀ hB : IsSemimetric (fun x y : B => d x.val y.val),
-      OnlyTrivial (fun x y : B => d x.val y.val) hB 1 1) ∧
-    Robust d hd P hP 1 1 ∧ ¬ IsTrivial P)
+open SemimetricSpace Partitions PartitionRobustness
+
+/-- The nonempty subspace A admits only trivial (μ,ε)-robust partitions. -/
+def OnlyTrivialOn {S : Type} (d : Distance S) (_hd : IsSemimetricSpace d)
+    (A : Set S) (μ : ℝ≥0) (ε : ℝ>0) : Prop :=
+  let dA : Distance A := fun x y => d x.val y.val
+  ∃ hA : IsSemimetricSpace dA, OnlyTrivial dA hA μ ε
+
+/-- Proposed restriction principle: local triviality forces every robust ambient
+partition to contain the subset in a single part. Lemma 1 refutes this principle. -/
+def RestrictionPrinciple : Prop :=
+  ∀ (S : Type) (d : Distance S) (hd : IsSemimetricSpace d)
+    (μ : ℝ≥0) (ε : ℝ>0) (S₁ : Set S)
+    (_proper : S₁ᶜ.Nonempty)
+    (_local : OnlyTrivialOn d hd S₁ μ ε)
+    (P : Set (Set S)) (hP : IsPartition P)
+    (_robust : MuEpsilonRobustPartition d hd P hP μ ε),
+    ∃ Sᵢ ∈ P, S₁ ⊆ Sᵢ
+
+/-- Proposed union principle: local triviality on two overlapping proper subsets
+forces triviality on their union. Lemma 1 refutes this principle. -/
+def UnionPrinciple : Prop :=
+  ∀ (S : Type) (d : Distance S) (hd : IsSemimetricSpace d)
+    (μ : ℝ≥0) (ε : ℝ>0) (S₁ S₂ : Set S)
+    (_proper₁ : S₁ᶜ.Nonempty) (_proper₂ : S₂ᶜ.Nonempty)
+    (_overlap : (S₁ ∩ S₂).Nonempty)
+    (_cover : S₁ ∪ S₂ = Set.univ)
+    (_local₁ : OnlyTrivialOn d hd S₁ μ ε)
+    (_local₂ : OnlyTrivialOn d hd S₂ μ ε),
+    OnlyTrivial d hd μ ε
+
+/-- Neither the restriction principle nor the union principle holds in general. -/
+axiom lemma1 : ¬ RestrictionPrinciple ∧ ¬ UnionPrinciple
 
 end Lax544225.Noncompositionality

@@ -10,7 +10,7 @@ these declarations are illustrations and do not add concepts.
 
 namespace Lax544225Proofs.FlocqExamples
 
-open Lax544225.Semimetric Lax544225.OrderedSemimetric
+open Lax544225.SemimetricSpace Lax544225.OrderedSemimetric
 open Lax544225.BinaryFloats Lax544225.FloatAbsoluteSpace Lax544225.FloatSquaredSpace
 open Lax544225.SumProductSpace Lax544225.MaximumProductSpace Lax544225.ListSpaces
 open Lax544225Proofs.FlocqBridge
@@ -211,25 +211,25 @@ lemma binary64NaNListLengthPenalty :
     sup_range_two, List.getD, d_nan_nan]
 
 lemma binary64SumProductOrdered (n : ℕ) :
-    IsOrdered (sumDistance (absDistance binary64) n) (productLe (ieeeLe binary64) n) := by
+    IsOrderedSemimetricSpace (sumDistance (absDistance binary64) n) (productLe (ieeeLe binary64) n) := by
   exact Lax544225Proofs.sumProductSpace (absDistance binary64) (ieeeLe binary64)
     (FloatEmbedding.floatAbsoluteSpace binary64) n
 
 lemma binary64MaximumProductOrdered (n : ℕ) :
-    IsOrdered (Lax544225.MaximumProductSpace.maxDistance (absDistance binary64) n)
+    IsOrderedSemimetricSpace (Lax544225.MaximumProductSpace.maxDistance (absDistance binary64) n)
       (Lax544225.MaximumProductSpace.synchronizedLe (absDistance binary64) (ieeeLe binary64) n) := by
   exact Lax544225Proofs.maximumProductSpace (absDistance binary64) (ieeeLe binary64)
     (FloatEmbedding.floatAbsoluteSpace binary64)
     (FloatEmbedding.floatAbsoluteAdditivity binary64) n
 
 lemma binary64SumListOrdered :
-    IsOrdered (Lax544225.ListSpaces.sumDistance (absDistance binary64) Value.nan)
+    IsOrderedSemimetricSpace (Lax544225.ListSpaces.sumDistance (absDistance binary64) Value.nan)
       (Lax544225.ListSpaces.listLe (ieeeLe binary64) Value.nan) := by
   exact Lax544225Proofs.sumListSpace (absDistance binary64) (ieeeLe binary64)
     (FloatEmbedding.floatAbsoluteSpace binary64) Value.nan
 
 lemma binary64MaximumListOrdered :
-    IsOrdered (Lax544225.ListSpaces.maxDistance (absDistance binary64) Value.nan)
+    IsOrderedSemimetricSpace (Lax544225.ListSpaces.maxDistance (absDistance binary64) Value.nan)
       (Lax544225.ListSpaces.synchronizedListLe (absDistance binary64) (ieeeLe binary64) Value.nan) := by
   exact Lax544225Proofs.maximumListSpace (absDistance binary64) (ieeeLe binary64)
     (FloatEmbedding.floatAbsoluteSpace binary64)

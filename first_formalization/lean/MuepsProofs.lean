@@ -19,3 +19,5 @@ import MuepsProofs.FlocqBridge
 import MuepsProofs.FlocqExamples
 import MuepsProofs.FlocqStrict
 import MuepsProofs.PaperExamples
+import MuepsProofs.ClassifierPartitionEquivalence
+import MuepsProofs.PartitionSeparability

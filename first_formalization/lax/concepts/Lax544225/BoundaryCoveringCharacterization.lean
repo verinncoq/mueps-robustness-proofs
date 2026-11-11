@@ -42,15 +42,15 @@ universe u
 namespace Lax544225.BoundaryCoveringCharacterization
 
 open scoped NNReal
-open Semimetric OrderedSemimetric Balls Boundary
+open SemimetricSpace OrderedSemimetric Balls Boundary
 
 /-- In a finite totally ordered semimetric space, covering every proper cut is equivalent to covering its within-side μ-ball from the opposite boundary. -/
-axiom statement {S : Type u} [Finite S] [LinearOrder S] (d : Distance S)
-    (hd : IsOrdered d (· ≤ ·)) (μ ε : ℝ≥0) (hε : 0 < ε) :
-    (∀ A : Set S, A.Nonempty → Aᶜ.Nonempty →
-      ∃ x, (x ∈ A ∧ ball d hd.1 x μ ⊆ neighborhood d hd.1 Aᶜ ε) ∨
-        (x ∈ Aᶜ ∧ ball d hd.1 x μ ⊆ neighborhood d hd.1 A ε)) ↔ (∀ A : Set S, A.Nonempty → Aᶜ.Nonempty →
-      ∃ x, (x ∈ A ∧ ball d hd.1 x μ ∩ A ⊆ neighborhood d hd.1 (complementBoundary A) ε) ∨
-        (x ∈ Aᶜ ∧ ball d hd.1 x μ ∩ Aᶜ ⊆ neighborhood d hd.1 (boundary A) ε))
+axiom theorem3 {S : Type u} [Finite S] [LinearOrder S] (d : Distance S)
+    (hd : IsOrderedSemimetricSpace d (· ≤ ·)) (μ : ℝ≥0) (ε : ℝ>0) :
+    (∀ S' : Set S, S'.Nonempty → S'ᶜ.Nonempty →
+      ∃ x, (x ∈ S' ∧ ball d hd.1 x μ ⊆ unionOfBalls d hd.1 S'ᶜ ε) ∨
+        (x ∈ S'ᶜ ∧ ball d hd.1 x μ ⊆ unionOfBalls d hd.1 S' ε)) ↔ (∀ S' : Set S, S'.Nonempty → S'ᶜ.Nonempty →
+      ∃ x, (x ∈ S' ∧ ball d hd.1 x μ ∩ S' ⊆ unionOfBalls d hd.1 (boundary S'ᶜ) ε) ∨
+        (x ∈ S'ᶜ ∧ ball d hd.1 x μ ∩ S'ᶜ ⊆ unionOfBalls d hd.1 (boundary S') ε))
 
 end Lax544225.BoundaryCoveringCharacterization

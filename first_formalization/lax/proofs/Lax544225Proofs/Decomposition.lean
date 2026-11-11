@@ -2,13 +2,14 @@ import Lax544225Proofs.SubspaceDistance
 import Lax544225.DecompositionObstruction
 import Lax544225.PartialOrderPrecisionBound
 import Lax544225.PrecisionObstruction
+import Lax544225.GeneralExistence
 import Lax544225Proofs.Basic
 import Mathlib.Data.Set.Finite.Basic
 
 universe u
 namespace Lax544225Proofs.Decomposition
 open scoped NNReal
-open Lax544225 Semimetric Partitions PartitionRobustness Balls Decomposition OrderedSemimetric PrecisionGaps
+open Lax544225 SemimetricSpace Partitions PartitionRobustness Balls Decomposition OrderedSemimetric PrecisionGaps
 
 private def trace {S : Type u} (A B : Set S) : Set A := {x | x.val ∈ B}
 private def traceFamily {S : Type u} (A : Set S) (P : Set (Set S)) : Set (Set A) :=
@@ -28,11 +29,11 @@ private lemma trace_partition {S : Type u} (A : Set S) {P : Set (Set S)}
     have hEB : E = B := hu E ⟨hE.1, hxE⟩
     rw [hEB]
 
-private lemma trace_robust {S : Type u} (d : Distance S) (hd : IsSemimetric d)
-    {P : Set (Set S)} (hP : IsPartition P) (A : Set S) (hA : IsSemimetric (restrict d A))
-    (μ ε : ℝ≥0) (hrob : Robust d hd P hP μ ε)
+private lemma trace_robust {S : Type u} (d : Distance S) (hd : IsSemimetricSpace d)
+    {P : Set (Set S)} (hP : IsPartition P) (A : Set S) (hA : IsSemimetricSpace (restrict d A))
+    (μ : ℝ≥0) (ε : ℝ>0) (hrob : MuEpsilonRobustPartition d hd P hP μ ε)
     (hclosed : ∀ x ∈ A, ball d hd x μ ⊆ A) :
-    Robust (restrict d A) hA (traceFamily A P) (trace_partition A hP) μ ε := by
+    MuEpsilonRobustPartition (restrict d A) hA (traceFamily A P) (trace_partition A hP) μ ε := by
   intro x
   obtain ⟨y, hxy, B, hB, hxB, hball⟩ := hrob x.val
   have hyA := hclosed x.val x.property hxy
@@ -42,8 +43,8 @@ private lemma trace_robust {S : Type u} (d : Distance S) (hd : IsSemimetric d)
     exact hball hz
 
 private lemma piece_monochromatic {S : Type u} (d : Distance S)
-    (hd : IsSemimetric d) {P : Set (Set S)} (hP : IsPartition P) (μ ε : ℝ≥0)
-    (hrob : Robust d hd P hP μ ε) (A : Set S) (hA : IsSemimetric (restrict d A))
+    (hd : IsSemimetricSpace d) {P : Set (Set S)} (hP : IsPartition P) (μ : ℝ≥0) (ε : ℝ>0)
+    (hrob : MuEpsilonRobustPartition d hd P hP μ ε) (A : Set S) (hA : IsSemimetricSpace (restrict d A))
     (hclosed : ∀ x ∈ A, ball d hd x μ ⊆ A)
     (hlocal : OnlyTrivial (restrict d A) hA μ ε) :
     ∀ B ∈ P, (A ∩ B).Nonempty → A ⊆ B := by
@@ -61,7 +62,7 @@ private lemma piece_monochromatic {S : Type u} (d : Distance S)
 
 /--
 ---
-conclusion: Lax544225.DecompositionObstruction.statement
+conclusion: Lax544225.DecompositionObstruction.theorem5
 ---
 Local triviality propagates through a closed overlap decomposition.
 
@@ -76,16 +77,16 @@ part to any input, forcing that part to be the whole carrier.
 
 Theorem 5 of Aleksandrov, Kuske and Völlinger, *(μ,ε)-Robustness: Characterization, Existence, and Precision-Dependent Bounds*, revised FSEN 2027 manuscript (9 November 2026).
 -/
-theorem decompositionObstruction {S : Type u} (d : Distance S) (hd : IsSemimetric d)
-    (D : Set (Set S)) (μ ε : ℝ≥0) (_hε : 0 < ε)
+theorem decompositionObstruction {S : Type u} (d : Distance S) (hd : IsSemimetricSpace d)
+    (D : Set (Set S)) (μ : ℝ≥0) (ε : ℝ>0)
     (hD : IsDecomposition d hd D μ)
-    (hlocal : ∀ A ∈ D, ∀ hA : IsSemimetric (restrict d A),
+    (hlocal : ∀ A ∈ D, ∀ hA : IsSemimetricSpace (restrict d A),
       OnlyTrivial (restrict d A) hA μ ε) : OnlyTrivial d hd μ ε := by
   classical
   intro P hP hrob
   have hmono : ∀ A ∈ D, ∀ B ∈ P, (A ∩ B).Nonempty → A ⊆ B := by
     intro A hA
-    have hsm : IsSemimetric (restrict d A) :=
+    have hsm : IsSemimetricSpace (restrict d A) :=
       restrict_isSemimetric d hd A (hD.2.1 A hA)
     exact piece_monochromatic d hd hP μ ε hrob A hsm (hD.2.2.1 A hA)
       (hlocal A hA hsm)
@@ -98,11 +99,13 @@ theorem decompositionObstruction {S : Type u} (d : Distance S) (hd : IsSemimetri
     have hstart : A ⊆ B := hmono A hA B hB ⟨x, hxA, hx⟩
     have hend : E ⊆ B := by
       clear hyE hE
+      unfold Chain at hpath
+      rcases hpath with ⟨_, _, hpath⟩
       induction hpath with
       | refl => exact hstart
       | @tail C E hpath hCE ih =>
           obtain ⟨z, hzC, hzE⟩ := hCE.2.2
-          exact hmono E hCE.2.1 B hB ⟨z, hzE, ih hzC⟩
+          exact hmono E hCE.2.1 B hB ⟨z, hzE, ih hCE.1 hzC⟩
     exact hend hyE
   change P = {Set.univ}
   apply Set.ext
@@ -118,37 +121,48 @@ theorem decompositionObstruction {S : Type u} (d : Distance S) (hd : IsSemimetri
 
 /--
 ---
-conclusion: Lax544225.PartialOrderPrecisionBound.statement
+conclusion: Lax544225.PartialOrderPrecisionBound.corollary3
 ---
 Precision bounds on totally ordered decomposition pieces imply global triviality.
 
 # Proof strategy
 
 Give each piece its inherited linear order, preserving the interval steps in
-its precision measures. Apply the total-order precision obstruction on each
-piece, then use the closed overlap decomposition theorem.
+its precision measures. A singleton has no nonempty proper cut, so the general
+existence criterion gives triviality. Apply the total-order precision obstruction
+on every nontrivial piece, then use the closed overlap decomposition theorem.
 
 # Attribution
 
-Corollary 3 of Aleksandrov, Kuske and Völlinger, *(μ,ε)-Robustness: Characterization, Existence, and Precision-Dependent Bounds*, revised FSEN 2027 manuscript (9 November 2026).
+Corollary 3 of Aleksandrov, Kuske and Völlinger, *(μ,ε)-Robustness: Characterization, Existence, and Precision-Dependent Bounds*, revised FSEN 2027 manuscript (TeX update received 11 November 2026).
 -/
-lemma partialOrderPrecisionBound {S : Type u} [Finite S] [PartialOrder S]
-    (d : Distance S) (hd : IsOrdered d (· ≤ ·)) (D : Set (Set S))
-    (μ ε : ℝ≥0) (hε : 0 < ε) (hD : IsDecomposition d hd.1 D μ)
-    (hchain : ∀ A ∈ D, ∀ x ∈ A, ∀ y ∈ A, x ≤ y ∨ y ≤ x)
-    (hbound : ∀ A ∈ D, ∀ hA : IsOrdered (restrict d A) (· ≤ ·),
+lemma partialOrderPrecisionBound {S : Type u} [Finite S] [PartialOrder S] [Nontrivial S]
+    (d : Distance S) (hd : IsOrderedSemimetricSpace d (· ≤ ·)) (D : Set (Set S))
+    (μ : ℝ≥0) (ε : ℝ>0) (hD : IsDecomposition d hd.1 D μ)
+    (hchain : ∀ A ∈ D, IsChain (· ≤ ·) A)
+    (hbound : ∀ A ∈ D, ∀ [Std.Total (α := A) (· ≤ ·)] [Nontrivial A], ∀ hA : IsOrderedSemimetricSpace (restrict d A) (· ≤ ·),
       threshold (restrict d A) hA μ ≤ ε) : OnlyTrivial d hd.1 μ ε := by
   classical
-  apply DecompositionObstruction.statement d hd.1 D μ ε hε hD
-  intro A hA hsm
+  apply DecompositionObstruction.theorem5 d hd.1 D μ ε hD
+  intro A hA
+  dsimp only
+  intro hsm
   let : LinearOrder A := {
     (inferInstance : PartialOrder A) with
-    le_total := fun x y => hchain A hA x.val x.property y.val y.property
+    le_total := fun x y => (hchain A hA).total x.property y.property
     toDecidableLE := Classical.decRel _ }
-  have ho : IsOrdered (restrict d A) (· ≤ ·) := by
+  have ho : IsOrderedSemimetricSpace (restrict d A) (· ≤ ·) := by
     refine ⟨hsm, inferInstance, ?_⟩
     intro x y z hxy hyz
     exact hd.2.2 x.val y.val z.val hxy hyz
-  exact PrecisionObstruction.statement (restrict d A) ho μ ε hε (hbound A hA ho)
+  rcases subsingleton_or_nontrivial A with hsub | hnontrivial
+  · let : Subsingleton A := hsub
+    apply (GeneralExistence.theorem2 (restrict d A) hsm μ ε).mpr
+    intro B hB hBc
+    obtain ⟨x, hx⟩ := hB
+    obtain ⟨y, hy⟩ := hBc
+    exact False.elim (hy ((Subsingleton.elim x y) ▸ hx))
+  · let : Nontrivial A := hnontrivial
+    exact PrecisionObstruction.corollary2 (restrict d A) ho μ ε (hbound A hA ho)
 
 end Lax544225Proofs.Decomposition

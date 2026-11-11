@@ -11,12 +11,12 @@ universe u
 namespace Lax544225Proofs.MainResults
 
 open scoped NNReal
-open Lax544225 Semimetric Partitions PartitionRobustness CoveringConditions
+open Lax544225 SemimetricSpace Partitions PartitionRobustness CoveringConditions
   OrderedSemimetric Boundary
 
 /--
 ---
-conclusion: Lax544225.CoveringCharacterization.statement
+conclusion: Lax544225.CoveringCharacterization.theorem1
 ---
 Theorem 1: robustness is equivalent to failure of opposite-part coverage.
 
@@ -31,15 +31,15 @@ supplies a center whose ε-ball stays within the selected part.
 Theorem 1 of Aleksandrov, Kuske and Völlinger, *(μ,ε)-Robustness: Characterization, Existence, and Precision-Dependent Bounds*, revised FSEN 2027 manuscript (9 November 2026).
 -/
 theorem coveringCharacterization {S : Type u} (d : Distance S)
-    (hd : IsSemimetric d) (P : Set (Set S)) (hP : IsPartition P)
-    (μ ε : ℝ≥0) (hε : 0 < ε) :
-    Robust d hd P hP μ ε ↔ Uncovered d hd P μ ε :=
-  ⟨Basic.robustToUncovered d hd P hP μ ε hε,
-    Basic.uncoveredToRobust d hd P hP μ ε hε⟩
+    (hd : IsSemimetricSpace d) (P : Set (Set S)) (hP : IsPartition P)
+    (μ : ℝ≥0) (ε : ℝ>0) :
+    MuEpsilonRobustPartition d hd P hP μ ε ↔ Uncovered d hd P μ ε :=
+  ⟨Basic.robustToUncovered d hd P hP μ ε,
+    Basic.uncoveredToRobust d hd P hP μ ε⟩
 
 /--
 ---
-conclusion: Lax544225.GeneralExistence.statement
+conclusion: Lax544225.GeneralExistence.theorem2
 ---
 Theorem 2: only-trivial robustness is equivalent to coverage of every proper cut.
 
@@ -53,15 +53,15 @@ proper part of a robust partition contradicts coverage of that cut.
 
 Theorem 2 of Aleksandrov, Kuske and Völlinger, *(μ,ε)-Robustness: Characterization, Existence, and Precision-Dependent Bounds*, revised FSEN 2027 manuscript (9 November 2026).
 -/
-theorem generalExistence {S : Type u} (d : Distance S) (hd : IsSemimetric d)
-    (μ ε : ℝ≥0) (hε : 0 < ε) :
+theorem generalExistence {S : Type u} (d : Distance S) (hd : IsSemimetricSpace d)
+    (μ : ℝ≥0) (ε : ℝ>0) :
     OnlyTrivial d hd μ ε ↔ EveryCutCovered d hd μ ε :=
-  ⟨Existence.trivialityToCutCovering d hd μ ε hε,
-    Existence.cutCoveringToTriviality d hd μ ε hε⟩
+  ⟨Existence.trivialityToCutCovering d hd μ ε,
+    Existence.cutCoveringToTriviality d hd μ ε⟩
 
 /--
 ---
-conclusion: Lax544225.BoundaryCoveringCharacterization.statement
+conclusion: Lax544225.BoundaryCoveringCharacterization.theorem3
 ---
 Theorem 3: cut covering is equivalent to covering from opposite boundaries.
 
@@ -77,14 +77,14 @@ coverage, opposite-side points cover themselves with their own ε-balls.
 Theorem 3 of Aleksandrov, Kuske and Völlinger, *(μ,ε)-Robustness: Characterization, Existence, and Precision-Dependent Bounds*, revised FSEN 2027 manuscript (9 November 2026).
 -/
 theorem boundaryCoveringCharacterization {S : Type u} [Finite S] [LinearOrder S]
-    (d : Distance S) (hd : IsOrdered d (· ≤ ·)) (μ ε : ℝ≥0) (hε : 0 < ε) :
+    (d : Distance S) (hd : IsOrderedSemimetricSpace d (· ≤ ·)) (μ : ℝ≥0) (ε : ℝ>0) :
     EveryCutCovered d hd.1 μ ε ↔ EveryCutBoundaryCovered d hd.1 μ ε :=
-  ⟨OrderedBounds.cutToBoundaryCovering d hd μ ε hε,
-    OrderedBounds.boundaryToCutCovering d hd μ ε hε⟩
+  ⟨OrderedBounds.cutToBoundaryCovering d hd μ ε,
+    OrderedBounds.boundaryToCutCovering d hd μ ε⟩
 
 /--
 ---
-conclusion: Lax544225.BoundaryExistence.statement
+conclusion: Lax544225.BoundaryExistence.corollary1
 ---
 Corollary 1: only-trivial robustness is equivalent to opposite-boundary covering.
 
@@ -99,9 +99,9 @@ boundary characterization converts cut covering to boundary covering.
 Corollary 1 of Aleksandrov, Kuske and Völlinger, *(μ,ε)-Robustness: Characterization, Existence, and Precision-Dependent Bounds*, revised FSEN 2027 manuscript (9 November 2026).
 -/
 lemma boundaryExistence {S : Type u} [Finite S] [LinearOrder S]
-    (d : Distance S) (hd : IsOrdered d (· ≤ ·)) (μ ε : ℝ≥0) (hε : 0 < ε) :
+    (d : Distance S) (hd : IsOrderedSemimetricSpace d (· ≤ ·)) (μ : ℝ≥0) (ε : ℝ>0) :
     OnlyTrivial d hd.1 μ ε ↔ EveryCutBoundaryCovered d hd.1 μ ε :=
-  ⟨OrderedBounds.trivialityToBoundaryCovering d hd μ ε hε,
-    OrderedBounds.boundaryCoveringToTriviality d hd μ ε hε⟩
+  ⟨OrderedBounds.trivialityToBoundaryCovering d hd μ ε,
+    OrderedBounds.boundaryCoveringToTriviality d hd μ ε⟩
 
 end Lax544225Proofs.MainResults

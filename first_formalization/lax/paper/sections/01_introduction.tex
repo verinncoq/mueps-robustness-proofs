@@ -18,8 +18,7 @@ local robustness restricts it to hand-picked
 inputs~\cite{li2024certifying}; confidence-based notions to high-confidence
 inputs~\cite{athavale2024verifying,leino2021globally}; probabilistic notions bound the probability of
 drawing an $\epsilon$-close pair with different labels~\cite{mangal2019robustness,levy2023groma}.
-Probabilistic bounds, however, constrain how many inputs are non-robust, not the geometric structure
-where they lie: Fig.~\ref{fig:grid} shows a classifier that satisfies such a
+Probabilistic bounds, however, constrain  the probability of robustness violations, not their geometric structure: Fig.~\ref{fig:grid} shows a classifier that satisfies such a
 bound although no input is locally robust.
 
 To address this limitation, we introduce $(\mu,\epsilon)$-robustness:
@@ -62,7 +61,7 @@ We obtain bounds on $\epsilon$ and $\mu$ in terms of the largest and smallest re
   verified the constructions in Rocq on top of
   Flocq~\cite{boldo2011flocq}, and differentially tested the resulting executable
   distances against an independent implementation on special values and
-  randomly generated binary64 bit patterns.
+  randomly generated binary 64-bit patterns.
 
 \end{enumerate}
 Our results concern whether robust classifiers \emph{exist} in a given domain;

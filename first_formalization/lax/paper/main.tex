@@ -57,7 +57,7 @@ Technische Universität Berlin, Berlin, Germany \\
 A classifier is $\epsilon$-robust if it assigns the same label to any two inputs within distance $\epsilon$.
 On connected domains such as $\mathbb{R}^n$, every $\epsilon$-robust classifier is constant.
 Existing relaxations therefore weaken the guarantee to hand-picked or high-confidence inputs, or impose a bound on the probability of violations.
-Probabilistic bounds, however, constrain how many inputs are non-robust, not where they lie.
+Probabilistic bounds, however, constrain the probability of robustness violations, not where they lie.
 To bridge this gap, we introduce $(\mu,\epsilon)$-robustness, which requires every input to lie within the distance $\mu$ of a point with the same label at which the classifier is locally $\epsilon$-robust. It coincides with $\epsilon$-robustness at $\mu=0$.
 We study $(\mu,\epsilon)$-robustness over semimetric spaces, which capture non-metric similarity notions used in fairness and natural language processing. 
 Since deployed classifiers operate on finitely many representable inputs, we pay particular attention to finite domains such as IEEE 754 floating-point numbers.
@@ -79,7 +79,7 @@ All results are mechanized in Lean~4: machine-checked proofs were developed with
 
 \subsection*{AI Use Disclosure}
 
-In addition to the uses mentioned in the text, AI tools were also used to draft and edit the text of the article, simulate peer review, and generate LaTeX code for the figures. The tools used were Mistral Vibe, Microsoft Copilot, Overleaf AI assistant, as well as Claude Code. After using these tools, the authors reviewed and edited the content as needed and assume full responsibility for the content of the publication.
+In addition to the uses mentioned in the text, AI tools were also used to draft and edit the text of the article, simulate peer review, and generate LaTeX code for the figures. The tools used were Mistral Vibe, Microsoft Copilot, Overleaf AI assistant, as well as Claude Code and ChatGPT. After using these tools, the authors reviewed and edited the content as needed and assume full responsibility for the content of the publication.
 
 %
 % ---- Bibliography ----

@@ -12,7 +12,7 @@ A decomposition covers the space by pieces that contain every sufficiently nearb
 **Definition from the paper.**
 
 A collection of nonempty sets $D:=\{D_1,\dots,D_p\}$ is a
-**$(\mu,\epsilon)$-decomposition** of a semimetric space $(S,d)$ if and only if
+**$\mu$-decomposition** of a semimetric space $(S,d)$ if and only if
 
 1. For each $x\in D_i$, $B(x,\mu)\subseteq D_i$.
 2. For each $x_1,x_2\in S$, there is a sequence of sets
@@ -22,7 +22,7 @@ A collection of nonempty sets $D:=\{D_1,\dots,D_p\}$ is a
 
 # Formalization notes
 
-The definition depends only on μ; ε appears in the applications. `Chain D A B` names a finite overlap chain, including a chain consisting of a single member. Membership of each endpoint member and each link is explicit. Finiteness concerns the family, not the sizes of its members.
+The definition depends only on μ; ε appears in the robustness applications. `Chain D A B` names a finite overlap chain, including a chain consisting of a single member. Membership of each endpoint member and each link is explicit. Finiteness concerns the family, not the sizes of its members.
 -/
 
 universe u

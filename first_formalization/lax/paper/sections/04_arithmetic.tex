@@ -20,14 +20,7 @@ With these considerations, we arrive at our mathematical model standing for comp
 
 For example, $(\mathbb{R},\le, d)$ is an ordered semimetric space for $d(x,y) = |x - y|$ and $d(x,y) = (x - y)^2$. Note that with the second distance, $\mathbb{R}$ does not form a metric space.
 
-% lax begin Lax544225Proofs.FloatEmbedding.floatAbsoluteSpace
-\paragraph{Model Validation.} After defining ordered semimetric spaces, the question remains whether such spaces indeed exist on floating point numbers and can resemble common distances.
-% lax end
- To verify this, we employed autonomous AI-driven proof engineering using Mistral Vibe and GLM-5.3. 
-% lax begin Lax544225Proofs.listSpaces
-We prompted it to generate provably correct instances of ordered semimetric spaces with respect to the IEEE 754 total order on lists of Flocq~\cite{boldo2011flocq} floating point numbers within the Rocq proof assistant~\cite{rocq},
-% lax end
- re-implement the resulting distances for Python  64 bit \texttt{float} and produce a script for differential testing between Rocq and Python using fixed edge cases and randomly generated instances. The AI assistant generated the artifacts with minimal human intervention. The output was reviewed by humans later and is available on GitHub\footnote{\url{https://github.com/verinncoq/mueps-robustness-proofs/tree/main/flocq_ordered_spaces}} for further independent inspection. The following proposition summarizes the ordered semimetric constructions identified through this AI-assisted model validation process.
+\paragraph{Model Validation.} After defining ordered semimetric spaces, the question remains whether such spaces indeed exist on floating point numbers and can resemble common distances. To verify this, we employed autonomous AI-driven proof engineering using Mistral Vibe and GLM-5.3. We prompted it to generate provably correct instances of ordered semimetric spaces with respect to the IEEE 754 total order on lists of Flocq~\cite{boldo2011flocq} floating point numbers within the Rocq proof assistant~\cite{rocq}, re-implement the resulting distances for Python  64-bit \texttt{float} and produce a script for differential testing between Rocq and Python using fixed edge cases and randomly generated instances. The AI assistant generated the artifacts with minimal human intervention. The output was reviewed by humans later and is available on GitHub\footnote{\url{https://github.com/verinncoq/mueps-robustness-proofs/tree/main/flocq_ordered_spaces}} for further independent inspection. The following proposition summarizes the ordered semimetric constructions identified through this AI-assisted model validation process.
 
 \begin{proposition} 
 \label{prop:fp-space}
@@ -60,4 +53,4 @@ Then, the following are ordered semimetric spaces:
 \end{enumerate}
 \end{proposition}
 
-Note that Proposition~\ref{prop:fp-space} was verified for the second time in Lean as a part of the AI-assisted formalization. The combinations of spaces 1 and 3, 1 and 4 in Proposition~\ref{prop:fp-space} give us notions similar to $l_1$, $l_\infty$ distances, respectively. Overall, we showed that ordered semimetric spaces can be faithfully constructed on floating point numbers, showing that the results proven in the following sections are transferrable to computer arithmetic.
+Note that Proposition~\ref{prop:fp-space} was verified for the second time in Lean as a part of the AI-assisted formalization. For simplicity, the floating-point model uses a single canonical positive-sign \texttt{NaN} rather than all IEEE 754 \texttt{NaN} encodings. The construction can be extended to the full IEEE 754 total order by assigning distinct, order-preserving real values to the remaining \texttt{NaN} encodings. The combinations of spaces 1 and 3, 1 and 4 in Proposition~\ref{prop:fp-space} give us notions similar to $l_1$, $l_\infty$ distances, respectively. Overall, we showed that ordered semimetric spaces can be faithfully constructed on floating point numbers, showing that the results proven in the following sections are transferrable to computer arithmetic.

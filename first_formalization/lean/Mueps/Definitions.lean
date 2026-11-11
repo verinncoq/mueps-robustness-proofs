@@ -14,3 +14,4 @@ import Mueps.Partitions
 import Mueps.PrecisionGaps
 import Mueps.SemimetricSpace
 import Mueps.SumProductSpace
+import Mueps.Noncompositionality

@@ -28,15 +28,18 @@ The codomain ℝ≥0 supplies nonnegativity. The carrier is a type; nonemptiness
 
 universe u
 
-namespace Lax544225.Semimetric
+namespace Lax544225.SemimetricSpace
 
 open scoped NNReal
+
+/-- Strictly positive real numbers, used for robustness radii. -/
+scoped notation "ℝ>0" => {r : ℝ≥0 // 0 < r}
 
 /-- A nonnegative real-valued distance on a carrier. -/
 abbrev Distance (S : Type u) := S → S → ℝ≥0
 
 /-- The defining properties of a semimetric space, including a nonempty carrier. -/
-def IsSemimetric {S : Type u} (d : Distance S) : Prop :=
+def IsSemimetricSpace {S : Type u} (d : Distance S) : Prop :=
   Nonempty S ∧ (∀ x y, d x y = 0 ↔ x = y) ∧ (∀ x y, d x y = d y x)
 
-end Lax544225.Semimetric
+end Lax544225.SemimetricSpace

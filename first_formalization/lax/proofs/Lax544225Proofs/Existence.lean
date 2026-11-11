@@ -5,7 +5,7 @@ import Lax544225Proofs.Basic
 universe u
 namespace Lax544225Proofs.Existence
 open scoped NNReal
-open Lax544225 Semimetric Partitions PartitionRobustness Balls CoveringConditions
+open Lax544225 SemimetricSpace Partitions PartitionRobustness Balls CoveringConditions
 
 lemma cut_partition {S : Type u} (A : Set S) (hA : A.Nonempty)
     (hAc : Aᶜ.Nonempty) : IsPartition ({A, Aᶜ} : Set (Set S)) := by
@@ -35,8 +35,8 @@ lemma part_disjoint {S : Type u} {P : Set (Set S)} (hP : IsPartition P)
   intro x hx hxb
   exact (hP.2.pairwiseDisjoint hA hB hne).le_bot ⟨hx, hxb⟩
 
-lemma neighborhood_mono {S : Type u} (d : Distance S) (hd : IsSemimetric d) (r : ℝ≥0)
-    {A B : Set S} (h : A ⊆ B) : neighborhood d hd A r ⊆ neighborhood d hd B r := by
+lemma unionOfBalls_mono {S : Type u} (d : Distance S) (hd : IsSemimetricSpace d) (r : ℝ≥0)
+    {A B : Set S} (h : A ⊆ B) : unionOfBalls d hd A r ⊆ unionOfBalls d hd B r := by
   rintro x ⟨y, hy, hxy⟩
   exact ⟨y, h hy, hxy⟩
 
@@ -52,8 +52,8 @@ uncovered-to-robust characterization and contradict its forced triviality.
 
 Theorem 2 of Aleksandrov, Kuske and Völlinger, *(μ,ε)-Robustness: Characterization, Existence, and Precision-Dependent Bounds*, revised FSEN 2027 manuscript (9 November 2026).
 -/
-lemma trivialityToCutCovering {S : Type u} (d : Distance S) (hd : IsSemimetric d)
-    (μ ε : ℝ≥0) (hε : 0 < ε) :
+lemma trivialityToCutCovering {S : Type u} (d : Distance S) (hd : IsSemimetricSpace d)
+    (μ : ℝ≥0) (ε : ℝ>0) :
     OnlyTrivial d hd μ ε → EveryCutCovered d hd μ ε := by
   classical
   intro htr A hA hAc
@@ -66,7 +66,7 @@ lemma trivialityToCutCovering {S : Type u} (d : Distance S) (hd : IsSemimetric d
     · have hB' : B = Aᶜ := Set.mem_singleton_iff.mp hB
       subst B
       exact hn ⟨x, Or.inr ⟨hx, by simpa using hcov⟩⟩
-  have hrob := (CoveringCharacterization.statement d hd _ hP μ ε hε).mpr hun
+  have hrob := (CoveringCharacterization.theorem1 d hd _ hP μ ε).mpr hun
   have heq := htr _ hP hrob
   have hAu : A = Set.univ := by
     have hmem : A ∈ ({A, Aᶜ} : Set (Set S)) := by simp
@@ -89,12 +89,12 @@ covering point. Thus every part is the whole carrier.
 
 Theorem 2 of Aleksandrov, Kuske and Völlinger, *(μ,ε)-Robustness: Characterization, Existence, and Precision-Dependent Bounds*, revised FSEN 2027 manuscript (9 November 2026).
 -/
-lemma cutCoveringToTriviality {S : Type u} (d : Distance S) (hd : IsSemimetric d)
-    (μ ε : ℝ≥0) (hε : 0 < ε) :
+lemma cutCoveringToTriviality {S : Type u} (d : Distance S) (hd : IsSemimetricSpace d)
+    (μ : ℝ≥0) (ε : ℝ>0) :
     EveryCutCovered d hd μ ε → OnlyTrivial d hd μ ε := by
   classical
   intro hcut P hP hrob
-  have hun := (CoveringCharacterization.statement d hd P hP μ ε hε).mp hrob
+  have hun := (CoveringCharacterization.theorem1 d hd P hP μ ε).mp hrob
   have hall : ∀ A ∈ P, A = Set.univ := by
     intro A hA
     by_contra hne
@@ -107,7 +107,7 @@ lemma cutCoveringToTriviality {S : Type u} (d : Distance S) (hd : IsSemimetric d
         intro heq
         exact hx (heq ▸ hxB)
       exact hun B hB x hxB
-        (hcov.trans (neighborhood_mono d hd ε (part_disjoint hP hA hB hAB)))
+        (hcov.trans (unionOfBalls_mono d hd ε (part_disjoint hP hA hB hAB)))
   change P = {Set.univ}
   apply Set.ext
   intro A

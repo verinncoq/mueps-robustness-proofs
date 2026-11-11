@@ -7,6 +7,9 @@ open Lean in
 run_cmd do
   let allowed := #[``propext, ``Classical.choice, ``Quot.sound]
   let results := #[
+    ``Mueps.ClassifierPartitionEquivalence.classifierInducedPartition_isPartition,
+    ``Mueps.ClassifierPartitionEquivalence.muEpsilonRobust_iff,
+    ``Mueps.PartitionSeparability.separated_iff_robust_zero,
     ``Mueps.Paper.CoveringCharacterization.theorem1,
     ``Mueps.Paper.GeneralExistence.theorem2,
     ``Mueps.Paper.BoundaryCoveringCharacterization.theorem3,

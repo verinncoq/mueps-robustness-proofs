@@ -32,7 +32,7 @@ namespace Lax544225.ListSpaces
 
 open scoped NNReal
 
-open Semimetric OrderedSemimetric
+open SemimetricSpace OrderedSemimetric
 open scoped BigOperators
 /-- Equal-length lists ordered coordinatewise; other lengths are incomparable. -/
 def listLe {S : Type u} (le : S → S → Prop) (pad : S) (f g : List S) : Prop :=
@@ -58,14 +58,15 @@ noncomputable def maxDistance {S : Type u} (d : Distance S) (pad : S) : Distance
   fun f g => lengthPenalty f g +
     (Finset.range (max f.length g.length)).sup (fun i => d (f.getD i pad) (g.getD i pad))
 
-/-- Both padded-list constructions are ordered semimetric spaces. -/
-axiom statement :
-    (∀ {S : Type u} (d : Distance S) (le : S → S → Prop),
-      IsOrdered d le → ∀ pad : S,
-        IsOrdered (Lax544225.ListSpaces.sumDistance d pad) (Lax544225.ListSpaces.listLe le pad)) ∧
-    (∀ {S : Type u} (d : Distance S) (le : S → S → Prop),
-      IsOrdered d le → Additive d le → ∀ pad : S,
-        IsOrdered (Lax544225.ListSpaces.maxDistance d pad)
-          (Lax544225.ListSpaces.synchronizedListLe d le pad))
+/-- The sum-distance list extension is an ordered semimetric space. -/
+axiom proposition1_sumList {S : Type u} (d : Distance S)
+    (le : S → S → Prop) (hd : IsOrderedSemimetricSpace d le) (pad : S) :
+    IsOrderedSemimetricSpace (sumDistance d pad) (listLe le pad)
+
+/-- The maximum-distance list extension is ordered when the base is additive. -/
+axiom proposition1_maximumList {S : Type u} (d : Distance S)
+    (le : S → S → Prop) (hd : IsOrderedSemimetricSpace d le)
+    (hadd : Additive d le) (pad : S) :
+    IsOrderedSemimetricSpace (maxDistance d pad) (synchronizedListLe d le pad)
 
 end Lax544225.ListSpaces

@@ -5,7 +5,8 @@ import Lax544225.Boundary
 import Lax544225.BoundaryCoveringCharacterization
 import Lax544225.BoundaryExistence
 import Lax544225.Classifier
-import Lax544225.ClassifierRobustness
+import Lax544225.ClassifierPartitionEquivalence
+import Lax544225.EpsilonRobustness
 import Lax544225.CoveringCharacterization
 import Lax544225.Decomposition
 import Lax544225.DecompositionObstruction
@@ -14,10 +15,11 @@ import Lax544225.ListSpaces
 import Lax544225.OrderedSemimetric
 import Lax544225.PartialOrderPrecisionBound
 import Lax544225.PartitionRobustness
+import Lax544225.PartitionSeparability
 import Lax544225.Partitions
 import Lax544225.PrecisionGaps
 import Lax544225.PrecisionObstruction
-import Lax544225.Semimetric
+import Lax544225.SemimetricSpace
 import Lax544225.SuccessorCovering
 import Lax544225.FloatAbsoluteSpace
 import Lax544225.FloatSquaredSpace

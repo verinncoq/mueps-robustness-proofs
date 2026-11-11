@@ -26,7 +26,7 @@ universe u
 
 namespace Lax544225.SumProductSpace
 
-open Semimetric OrderedSemimetric
+open SemimetricSpace OrderedSemimetric
 open scoped BigOperators
 
 /-- Coordinatewise order on finite tuples. -/
@@ -38,7 +38,7 @@ noncomputable def sumDistance {S : Type u} (d : Distance S) (n : ℕ) : Distance
   fun f g => ∑ i, d (f i) (g i)
 
 /-- Sum products preserve ordered semimetric spaces. -/
-axiom statement {S : Type u} (d : Distance S) (le : S → S → Prop)
-    (hd : IsOrdered d le) (n : ℕ) : IsOrdered (sumDistance d n) (productLe le n)
+axiom proposition1_sumProduct {S : Type u} (d : Distance S) (le : S → S → Prop)
+    (hd : IsOrderedSemimetricSpace d le) (n : ℕ) : IsOrderedSemimetricSpace (sumDistance d n) (productLe le n)
 
 end Lax544225.SumProductSpace

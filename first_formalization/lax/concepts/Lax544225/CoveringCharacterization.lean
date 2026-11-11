@@ -28,11 +28,11 @@ universe u
 namespace Lax544225.CoveringCharacterization
 
 open scoped NNReal
-open Semimetric Partitions PartitionRobustness Balls
+open SemimetricSpace Partitions PartitionRobustness Balls
 
 /-- A finite partition is (μ,ε)-robust exactly when no μ-ball centered in a part is covered by ε-balls from its complement. -/
-axiom statement {S : Type u} (d : Distance S) (hd : IsSemimetric d) (P : Set (Set S))
-    (hP : IsPartition P) (μ ε : ℝ≥0) (hε : 0 < ε) :
-    Robust d hd P hP μ ε ↔ (∀ A ∈ P, ∀ x ∈ A, ¬ ball d hd x μ ⊆ neighborhood d hd Aᶜ ε)
+axiom theorem1 {S : Type u} (d : Distance S) (hd : IsSemimetricSpace d) (P : Set (Set S))
+    (hP : IsPartition P) (μ : ℝ≥0) (ε : ℝ>0) :
+    MuEpsilonRobustPartition d hd P hP μ ε ↔ (∀ Sᵢ ∈ P, ∀ x ∈ Sᵢ, ¬ ball d hd x μ ⊆ unionOfBalls d hd Sᵢᶜ ε)
 
 end Lax544225.CoveringCharacterization

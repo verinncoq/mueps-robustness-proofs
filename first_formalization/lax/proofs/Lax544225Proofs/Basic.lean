@@ -1,4 +1,4 @@
-import Lax544225.ClassifierRobustness
+import Lax544225.EpsilonRobustness
 import Lax544225.PartitionRobustness
 import Lax544225Proofs.CoveringConditions
 
@@ -9,8 +9,23 @@ universe u
 namespace Lax544225Proofs.Basic
 
 open scoped NNReal
-open Lax544225.Semimetric Lax544225.Classifier Lax544225.ClassifierRobustness
+open Lax544225
+open Lax544225.SemimetricSpace Lax544225.Classifier Lax544225.EpsilonRobustness
 open Lax544225.Partitions Lax544225.PartitionRobustness Lax544225.Balls Lax544225Proofs.CoveringConditions
+
+/-- The paper's distance formulation is equivalent to constancy on its closed ball. -/
+lemma locallyEpsilonRobust_iff_ball {S : Type u} {n : ℕ} (d : Distance S)
+    (hd : IsSemimetricSpace d) (c : Classifier S n) (ε : ℝ>0) (x_star : S) :
+    LocallyEpsilonRobust d hd c ε x_star ↔
+      ∀ x ∈ ball d hd x_star ε, c.label x = c.label x_star := Iff.rfl
+
+/-- Symmetry connects the paper's d(x,x') bound to membership of x' in B(x,μ). -/
+lemma muEpsilonRobust_iff_ball {S : Type u} {n : ℕ} (d : Distance S)
+    (hd : IsSemimetricSpace d) (c : Classifier S n) (μ : ℝ≥0) (ε : ℝ>0) :
+    EpsilonRobustness.MuEpsilonRobustClassifier d hd c μ ε ↔
+      ∀ x, ∃ x', x' ∈ ball d hd x μ ∧ c.label x = c.label x' ∧
+        LocallyEpsilonRobust d hd c ε x' := by
+  simp only [EpsilonRobustness.MuEpsilonRobustClassifier, ball, Set.mem_setOf_eq, hd.2.2]
 
 /-- The mathlib partition predicate preserves the finite-family formulation. -/
 lemma isPartition_iff {S : Type u} (P : Set (Set S)) :
@@ -23,10 +38,10 @@ lemma isPartition_iff {S : Type u} (P : Set (Set S)) :
   · rintro ⟨hfinite, hnonempty, hunique⟩
     exact ⟨hfinite, fun h => Set.nonempty_iff_ne_empty.mp (hnonempty ∅ h) rfl, hunique⟩
 
-lemma distance_self {S : Type u} {d : Distance S} (hd : IsSemimetric d) (x : S) :
+lemma distance_self {S : Type u} {d : Distance S} (hd : IsSemimetricSpace d) (x : S) :
     d x x = 0 := (hd.2.1 x x).2 rfl
 
-lemma mem_ball_self {S : Type u} {d : Distance S} (hd : IsSemimetric d)
+lemma mem_ball_self {S : Type u} {d : Distance S} (hd : IsSemimetricSpace d)
     (x : S) (r : ℝ≥0) : x ∈ ball d hd x r := by
   change d x x ≤ r
   rw [distance_self hd x]
@@ -37,9 +52,9 @@ lemma part_eq_of_mem {S : Type u} {P : Set (Set S)} (hP : IsPartition P)
     (hxA : x ∈ A) (hxB : x ∈ B) : A = B :=
   Setoid.eq_of_mem_eqv_class hP.2.2 hA hxA hB hxB
 
-lemma ball_subset_iff_not_mem_neighborhood {S : Type u} {d : Distance S}
-    (hd : IsSemimetric d) (A : Set S) (x : S) (ε : ℝ≥0) :
-    ball d hd x ε ⊆ A ↔ x ∉ neighborhood d hd Aᶜ ε := by
+lemma ball_subset_iff_not_mem_unionOfBalls {S : Type u} {d : Distance S}
+    (hd : IsSemimetricSpace d) (A : Set S) (x : S) (ε : ℝ≥0) :
+    ball d hd x ε ⊆ A ↔ x ∉ unionOfBalls d hd Aᶜ ε := by
   classical
   constructor
   · intro hball hneigh
@@ -72,16 +87,16 @@ each fiber, and the label of an input determines its unique fiber.
 Definitions 5–6 of *Relaxing Global Classifier Robustness on Semimetric Spaces*.
 -/
 lemma inducedPartition {S : Type u} {n : ℕ} (c : Classifier S n) :
-    IsPartition (induced c) := by
+    IsPartition (classifierInducedPartition c) := by
   classical
   apply (isPartition_iff _).mpr
-  refine ⟨Set.finite_range (fiber c), ?_, ?_⟩
+  refine ⟨Set.finite_range (classSet c), ?_, ?_⟩
   · intro A hA
     rcases hA with ⟨i, rfl⟩
     rcases c.surjective i with ⟨x, hx⟩
     exact ⟨x, hx⟩
   · intro x
-    refine ⟨fiber c (c.label x), ⟨⟨c.label x, rfl⟩, rfl⟩, ?_⟩
+    refine ⟨classSet c (c.label x), ⟨⟨c.label x, rfl⟩, rfl⟩, ?_⟩
     intro A hA
     rcases hA.1 with ⟨i, rfl⟩
     have hx : c.label x = i := hA.2
@@ -101,14 +116,14 @@ the same fiber.
 Definitions 4 and 8 of the source paper.
 -/
 lemma classifierToPartition {S : Type u} {n : ℕ} (d : Distance S)
-    (hd : IsSemimetric d) (c : Classifier S n) (μ ε : ℝ≥0) (_hε : 0 < ε) :
-    RelaxedRobust d hd c μ ε → Robust d hd (induced c) (inducedPartition c) μ ε := by
+    (hd : IsSemimetricSpace d) (c : Classifier S n) (μ : ℝ≥0) (ε : ℝ>0) :
+    EpsilonRobustness.MuEpsilonRobustClassifier d hd c μ ε → PartitionRobustness.MuEpsilonRobustPartition d hd (classifierInducedPartition c) (inducedPartition c) μ ε := by
   intro hc x
-  rcases hc x with ⟨x', hdist, hlabel, hlocal⟩
-  refine ⟨x', ?_, fiber c (c.label x), ⟨c.label x, rfl⟩, rfl, ?_⟩
+  rcases (muEpsilonRobust_iff_ball d hd c μ ε).mp hc x with ⟨x', hdist, hlabel, hlocal⟩
+  refine ⟨x', ?_, classSet c (c.label x), ⟨c.label x, rfl⟩, rfl, ?_⟩
   · exact hdist
   · intro y hy
-    exact (hlocal y hy).trans hlabel.symm
+    exact ((locallyEpsilonRobust_iff_ball d hd c ε x').mp hlocal y hy).trans hlabel.symm
 
 /--
 Robustness of the fiber partition gives relaxed classifier robustness.
@@ -123,9 +138,11 @@ ball, so it has the input's label; every point of the ball has that label too.
 Definitions 4 and 8 of the source paper.
 -/
 lemma partitionToClassifier {S : Type u} {n : ℕ} (d : Distance S)
-    (hd : IsSemimetric d) (c : Classifier S n) (μ ε : ℝ≥0) (_hε : 0 < ε) :
-    Robust d hd (induced c) (inducedPartition c) μ ε → RelaxedRobust d hd c μ ε := by
-  intro hP x
+    (hd : IsSemimetricSpace d) (c : Classifier S n) (μ : ℝ≥0) (ε : ℝ>0) :
+    PartitionRobustness.MuEpsilonRobustPartition d hd (classifierInducedPartition c) (inducedPartition c) μ ε → EpsilonRobustness.MuEpsilonRobustClassifier d hd c μ ε := by
+  intro hP
+  apply (muEpsilonRobust_iff_ball d hd c μ ε).mpr
+  intro x
   rcases hP x with ⟨x', hdist, A, hA, hx, hball⟩
   rcases hA with ⟨i, rfl⟩
   have hx' : c.label x' = i := hball (mem_ball_self hd x' ε)
@@ -147,14 +164,11 @@ input. Its local robustness is therefore the required local robustness.
 The zero-relaxation observation in Section 2 of the source paper.
 -/
 lemma zeroToGlobal {S : Type u} {n : ℕ} (d : Distance S)
-    (hd : IsSemimetric d) (c : Classifier S n) (ε : ℝ≥0) (_hε : 0 < ε) :
-    RelaxedRobust d hd c 0 ε → GloballyRobust d hd c ε := by
+    (hd : IsSemimetricSpace d) (c : Classifier S n) (ε : ℝ>0) :
+    EpsilonRobustness.MuEpsilonRobustClassifier d hd c 0 ε → GloballyEpsilonRobust d hd c ε := by
   intro h x
   rcases h x with ⟨x', hdist, _, hlocal⟩
-  have hdist' : d x x' ≤ 0 := by
-    rw [hd.2.2 x x']
-    exact hdist
-  have heq : x = x' := (hd.2.1 x x').1 (le_antisymm hdist' zero_le)
+  have heq : x = x' := (hd.2.1 x x').1 (le_antisymm hdist zero_le)
   simpa only [heq] using hlocal
 
 /--
@@ -169,8 +183,8 @@ Use the input itself as the robust center, whose self-distance is zero.
 The zero-relaxation observation in Section 2 of the source paper.
 -/
 lemma globalToZero {S : Type u} {n : ℕ} (d : Distance S)
-    (hd : IsSemimetric d) (c : Classifier S n) (ε : ℝ≥0) (_hε : 0 < ε) :
-    GloballyRobust d hd c ε → RelaxedRobust d hd c 0 ε := by
+    (hd : IsSemimetricSpace d) (c : Classifier S n) (ε : ℝ>0) :
+    GloballyEpsilonRobust d hd c ε → EpsilonRobustness.MuEpsilonRobustClassifier d hd c 0 ε := by
   intro h x
   exact ⟨x, (distance_self hd x).le, rfl, h x⟩
 
@@ -187,14 +201,14 @@ failure of coverage of the input's μ-ball.
 
 The forward implication of Theorem 1 in the source paper.
 -/
-lemma robustToUncovered {S : Type u} (d : Distance S) (hd : IsSemimetric d)
-    (P : Set (Set S)) (hP : IsPartition P) (μ ε : ℝ≥0) (_hε : 0 < ε) :
-    Robust d hd P hP μ ε → Uncovered d hd P μ ε := by
+lemma robustToUncovered {S : Type u} (d : Distance S) (hd : IsSemimetricSpace d)
+    (P : Set (Set S)) (hP : IsPartition P) (μ : ℝ≥0) (ε : ℝ>0) :
+    PartitionRobustness.MuEpsilonRobustPartition d hd P hP μ ε → Uncovered d hd P μ ε := by
   intro hrob A hA x hx hcovered
   rcases hrob x with ⟨x', hx', B, hB, hxB, hball⟩
   have hAB : A = B := part_eq_of_mem hP hA hB hx hxB
   subst B
-  exact (ball_subset_iff_not_mem_neighborhood hd A x' ε).1 hball (hcovered hx')
+  exact (ball_subset_iff_not_mem_unionOfBalls hd A x' ε).1 hball (hcovered hx')
 
 /--
 Uncovered neighborhoods yield a robust partition.
@@ -209,15 +223,15 @@ avoidance into containment of its ε-ball in the selected part.
 
 The reverse implication of Theorem 1 in the source paper.
 -/
-lemma uncoveredToRobust {S : Type u} (d : Distance S) (hd : IsSemimetric d)
-    (P : Set (Set S)) (hP : IsPartition P) (μ ε : ℝ≥0) (_hε : 0 < ε) :
-    Uncovered d hd P μ ε → Robust d hd P hP μ ε := by
+lemma uncoveredToRobust {S : Type u} (d : Distance S) (hd : IsSemimetricSpace d)
+    (P : Set (Set S)) (hP : IsPartition P) (μ : ℝ≥0) (ε : ℝ>0) :
+    Uncovered d hd P μ ε → PartitionRobustness.MuEpsilonRobustPartition d hd P hP μ ε := by
   classical
   intro hunc x
   rcases hP.2.2 x with ⟨A, ⟨hA, hxA⟩, _⟩
   rcases Set.not_subset.1 (hunc A hA x hxA) with ⟨x', hx', havoid⟩
   exact ⟨x', hx', A, hA, hxA,
-    (ball_subset_iff_not_mem_neighborhood hd A x' ε).2 havoid⟩
+    (ball_subset_iff_not_mem_unionOfBalls hd A x' ε).2 havoid⟩
 
 /--
 Zero-relaxation partition robustness separates distinct parts.
@@ -232,9 +246,9 @@ give the strict separation bound.
 
 The μ=0 consequence of Theorem 1 in the source paper.
 -/
-lemma zeroRobustToSeparated {S : Type u} (d : Distance S) (hd : IsSemimetric d)
-    (P : Set (Set S)) (hP : IsPartition P) (ε : ℝ≥0) (_hε : 0 < ε) :
-    Robust d hd P hP 0 ε → Separated d hd P hP ε := by
+lemma zeroRobustToSeparated {S : Type u} (d : Distance S) (hd : IsSemimetricSpace d)
+    (P : Set (Set S)) (hP : IsPartition P) (ε : ℝ>0) :
+    PartitionRobustness.MuEpsilonRobustPartition d hd P hP 0 ε → Separated d hd P hP ε := by
   intro hrob A hA B hB hAB x hx y hy
   apply lt_of_not_ge
   intro hdist
@@ -261,9 +275,9 @@ the separation bound excludes every part different from the input's part.
 
 The μ=0 consequence of Theorem 1 in the source paper.
 -/
-lemma separatedToZeroRobust {S : Type u} (d : Distance S) (hd : IsSemimetric d)
-    (P : Set (Set S)) (hP : IsPartition P) (ε : ℝ≥0) (_hε : 0 < ε) :
-    Separated d hd P hP ε → Robust d hd P hP 0 ε := by
+lemma separatedToZeroRobust {S : Type u} (d : Distance S) (hd : IsSemimetricSpace d)
+    (P : Set (Set S)) (hP : IsPartition P) (ε : ℝ>0) :
+    Separated d hd P hP ε → PartitionRobustness.MuEpsilonRobustPartition d hd P hP 0 ε := by
   classical
   intro hsep x
   rcases hP.2.2 x with ⟨A, ⟨hA, hxA⟩, _⟩

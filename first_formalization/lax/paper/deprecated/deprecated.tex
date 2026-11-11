@@ -1,0 +1,44 @@
+\subsection{Upper Bounds in Product Spaces}
+\label{subsec:bounds-product}
+
+Usually, classifiers are not defined on a single floating-point number but on multi-dimensional vectors that potentially consist of numbers with different precision (e.g. integers and floats). The total order given by an arithmetic over each vector dimension creates a partial order over the entire vector space. This multi-dimensional setting demands an extended result on the achievable robustness of a classifier. We start with a simple case of a union of two totally ordered semimetric spaces.
+
+\begin{lemma}[Subclassifier]
+    Let $(S, d)$ be a semimetric space with $\mu \geq 0, \epsilon > 0$. If $S' \subseteq S$ and the only $(\mu, \epsilon)$-robust partition on $(S', d)$ is trivial than every robust partition on $S$ containts a superset of $S'$.
+\end{lemma}
+
+\begin{lemma}[Union of Two Constant Classifiers]
+    \label{lem:intersecting-constant}
+    Let $(S := S_1 \cup S_2, d)$ be a semimetric space with $S_1 \cap S_2 \neq \emptyset$ and select $\mu \geq 0, \epsilon > 0$. If the only $(\mu, \epsilon)$-robust partitions on $S_1, S_2$ are trivial, then the only $(\mu, \epsilon)$-robust partition on $S$ is trivial.
+\end{lemma}
+\begin{proof}
+    We prove the condition (2.) from Theorem~\ref{thm:existence} for $S$. Let $S' \subset S$ be a nonempty proper subset. Let $S'_1 := S' \cap S_1$. If $S'_1$ is not empty and $S'_1 \neq S_1$, apply Theorem 2 to $S_1$ and $S'_1$ resulting in some $x \in S_1$ such that either $x \in S'_1 \subseteq S'$ and $B(x, \mu) \subseteq \bigcup_{x' \in S_1 \setminus S'_1} B(x', \epsilon) \subseteq \bigcup_{x' \in S \setminus S'} B(x', \epsilon)$ or $x \in S_1 \setminus S'_1 \subseteq  S \setminus S'$ with $B(x, \mu) \subseteq \bigcup_{x' \in S'_1} B(x', \epsilon) \subseteq \bigcup_{x' \in S'} B(x', \epsilon)$. Otherwise, $S'_2 := S' \cap S_2$ is not empty and $S'_2 \neq S_2$, in which case proof continues similarly as for $S'_1$. From two cases, condition (2.) from Theorem~\ref{thm:existence} is proven, implying by the same theorem that the only robust partition on $(S, d)$ is trivial.
+    \qed
+\end{proof}
+
+Now, we proceed with our main result establishing the upper bound for $\epsilon$ and $\mu$ over a product of totally ordered semimetric spaces.
+
+\begin{theorem}[Upper Bound on Products]
+    \label{thm:product-robust}
+    Let $(S_1, <_1, d_1), \dots, (S_p, <_p, d_p)$ be finite totally ordered semimetric spaces, $\Delta_1, \dots, \Delta_p$ and $\delta_1, \dots, \delta_p$ corresponding precision gaps. For $\epsilon \geq \max_{i \in [p]}(\Delta_i \cdot \delta_i \cdot \mu + \Delta_i)$, the only $(\mu,\epsilon)$-robust partition must be trivial on the product semimetric space:
+    $$(S := S_1 \times\dots \times S_p, d((x_1,\dots,x_p), (x'_1, \dots x'_p)) := \sum_{i \in [p]} d_i (x_i, x'_i))$$
+\end{theorem}
+\begin{proof}
+    (\emph{Step 1:})
+    Since the case $|S| < 2$ is trivial, we assume that $|S| \geq 2$.
+    We construct $p$ sets for each $x \in S$, one for each coordinate $i \in [p]$ of $x$,
+    such that a set contains the elements that
+    may differ from $x$ at position $i$ as follows $C_{i,x} := \{(c_1, \dots, c_p) \in S\,|\,c_j = x_j \text{ for all } j \in [p] \setminus \{i\}\}$. $C_{i,x}$ can be strictly totally ordered by using $<_i$ and its distance corresponds to $d_i$, forming an ordered semimetric space. Thus, by Corollary~\ref{cor:bounds-total}, every robust partition on $C_{i,x}$ is trivial, as it holds $\epsilon \geq \max_{j \in [p]}(\Delta_j \cdot \delta_j \cdot \mu + \Delta_j) \geq \Delta_i \cdot \delta_i \cdot \mu + \Delta_i$. 
+
+    (\emph{Step 2:})
+    In addition, consider the construction $C := \{C_{i,x}\,|\,i\in[p],x\in S\}$. Note how $x \in C_{i,x}$ for all $C_{i,x} \in C$. Therefore, it follows that $C$ covers $S$ completely: $\bigcup_{i \in [p], x \in S} C_{i,x} = S$. We show that the family $C$ is \emph{connected}: for any two elements $C_{i^r,x^r}$ and $C_{i^f,x^f}$, there is a chain  $C_{i^r,x^r}= L_0,L_1,...,L_k=C_{i^f,x^f}$ of sets in $C$ with $L_t \cap L_{t+1} \neq \emptyset$. 
+    Without loss of generality suppose $C_{i^r,x^r}$ and $C_{i^f,x^f}$ with $x^r \neq x^f$,
+    and let $D \subseteq [p]$ be the set of coordinates on which they differ. 
+    We construct a sequence of points $l^0,l^1, \dots, l^{|D|} \in S$ by setting $l^0 := x^r$ and obtaining $l^{i + 1}$ from $l^{i}$  by replacing coordinate $m_i := \min(\{j \in D\,|\,l^i_j \neq x^r_j\})$ with $x^r_{m_i}$. By construction, $l^i,l^{i+1} \in C_{m_i, l_i}$. Hence, the chain $C_{m_0,l^0}, C_{m_1,l^1}\dots,C_{m_{|D| - 1}, l^{|D| - 1}}$ connects $C_{i^r,x^r}$ which contains $x^r = l^0$ to $C_{i^f,x^f}$ which contains $x^f = l^{|D|}$.
+
+    (\emph{Step 3:})
+    Assume for contradiction that $P$ is a robust partition distinct from $\{S\}$ for $\epsilon \geq \max_{i \in [p]}(\Delta_i \cdot \delta_i \cdot \mu + \Delta_i)$. Then, there are two nonempty disjoint $P_1, P_2 \in P$ with $x \in P_1$ and $x^* \in P_2$. By step 2, there is a chain connecting $C_{1,x}$to $C_{r,x^*}$ for some $r \in [p]$. By step 1, all elements fo the chain have the trivial partition as the unique robust partition. As neighboring sets in the chain intersect, by Lemma~\ref{lem:intersecting-constant}, the only robust partition on $X := \bigcup_{l \in [r]}C_l$ is $\{X\}$, leading to contradiction as $x$ and $x^*$ must be separated.
+
+    Therefore, the only robust partition of S is $\{S\}$, which is induced by a constant classifier.
+    \qed
+\end{proof}

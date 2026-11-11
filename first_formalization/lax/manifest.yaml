@@ -14,7 +14,7 @@ bibEntries:
       title = {$(\mu,\epsilon)$-Robustness: Characterization, Existence, and Precision-Dependent Bounds},
       author = {Aleksandrov, Andrei and Kuske, Clemens and Völlinger, Kim},
       year = {2027},
-      note = {Revised FSEN 2027 manuscript and TeX sources, received 9 November 2026}
+      note = {Revised FSEN 2027 manuscript and TeX sources, received 11 November 2026}
     }
   - |
     @software{aleksandrovVoellinger2026robustnessproofs,

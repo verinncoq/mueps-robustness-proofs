@@ -1,9 +1,9 @@
-/- Adapted from lax-544225, source 62ba21d994907b076c31bc2328e0c3209bd1ea17.
+/- Adapted from lax-544225, source dbdbc610628949634c5cedeaa81437b2f7ce1293.
    Standalone Lean port, synchronized 11 November 2026: archive assumptions replaced by proved dependencies.
    Formalization: Clemens Kuske and Codex (OpenAI). Apache-2.0. -/
 
-import Mueps.Definitions
 import MuepsProofs.SubspaceDistance
+import Mueps.Definitions
 import MuepsProofs.Basic
 import MuepsProofs.Existence
 import Mathlib.Data.Nat.Dist
@@ -183,33 +183,19 @@ criterion; their subsets witness the two failures separately.
 Lemma 1 of Aleksandrov, Kuske and Völlinger's revised FSEN 2027 manuscript (9 November 2026).
 -/
 lemma noncompositionality :
-    (¬ ∀ (S : Type) (d : Distance S) (hd : IsSemimetricSpace d)
-      (μ : ℝ≥0) (ε : ℝ>0) (S₁ : Set S)
-      (hS₁ : IsSemimetricSpace (fun x y : S₁ => d x.val y.val)),
-      S₁ᶜ.Nonempty →
-      OnlyTrivial (fun x y : S₁ => d x.val y.val) hS₁ μ ε →
-      ∀ (P : Set (Set S)) (hP : IsPartition P),
-        MuEpsilonRobustPartition d hd P hP μ ε → ∃ Sᵢ ∈ P, S₁ ⊆ Sᵢ) ∧
-    (¬ ∀ (S : Type) (d : Distance S) (hd : IsSemimetricSpace d)
-      (μ : ℝ≥0) (ε : ℝ>0) (S₁ S₂ : Set S)
-      (hS₁ : IsSemimetricSpace (fun x y : S₁ => d x.val y.val))
-      (hS₂ : IsSemimetricSpace (fun x y : S₂ => d x.val y.val)),
-      S₁ᶜ.Nonempty → S₂ᶜ.Nonempty → (S₁ ∩ S₂).Nonempty → S₁ ∪ S₂ = Set.univ →
-      OnlyTrivial (fun x y : S₁ => d x.val y.val) hS₁ μ ε →
-      OnlyTrivial (fun x y : S₂ => d x.val y.val) hS₂ μ ε →
-      OnlyTrivial d hd μ ε) := by
+    ¬ Noncompositionality.RestrictionPrinciple ∧ ¬ Noncompositionality.UnionPrinciple := by
   constructor
   · intro h
     obtain ⟨d, hd, P, hP, A, hrob, hA, hAc, hlocal, hno⟩ := restrictionCounterexample
     have hsm := restrict_isSemimetric d hd A hA
-    exact hno (h (Fin 4) d hd 1 ⟨1, zero_lt_one⟩ A hsm hAc (hlocal hsm) P hP hrob)
+    exact hno (h (Fin 4) d hd 1 ⟨1, zero_lt_one⟩ A hAc ⟨hsm, hlocal hsm⟩ P hP hrob)
   · intro h
     obtain ⟨d, hd, A, B, P, hP, hAc, hBc, hoverlap, hcover, hlocalA, hlocalB,
       hrob, hnontrivial⟩ := unionCounterexample
     have hsmA := restrict_isSemimetric d hd A (hoverlap.mono Set.inter_subset_left)
     have hsmB := restrict_isSemimetric d hd B (hoverlap.mono Set.inter_subset_right)
-    have htrivial := h (Fin 4) d hd 1 ⟨1, zero_lt_one⟩ A B hsmA hsmB
-      hAc hBc hoverlap hcover (hlocalA hsmA) (hlocalB hsmB)
+    have htrivial := h (Fin 4) d hd 1 ⟨1, zero_lt_one⟩ A B
+      hAc hBc hoverlap hcover ⟨hsmA, hlocalA hsmA⟩ ⟨hsmB, hlocalB hsmB⟩
     exact hnontrivial (htrivial P hP hrob)
 
 end MuepsProofs.Counterexamples

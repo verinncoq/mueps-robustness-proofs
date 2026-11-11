@@ -18,7 +18,7 @@ $$\forall x\in S\;\exists x'\in B(x,\mu)\;
 
 # Formalization notes
 
-The robustness and separation predicates take explicit semimetric and partition evidence. Triviality of every robust partition quantifies over finite valid partitions. Separation uses a strict inequality because balls are closed.
+The parameter types encode μ ≥ 0 and ε > 0 directly: `μ : ℝ≥0` and `ε : ℝ>0`. Robustness and its only-trivial criterion take ε in this strictly positive subtype, without a separate positivity hypothesis. The robustness and separation predicates take explicit semimetric and partition evidence. Triviality of every robust partition quantifies over finite valid partitions. Separation uses a strict inequality because balls are closed.
 
 The auxiliary separation predicate requires $\epsilon<d(x,y)$ for points in distinct parts.
 -/
@@ -29,19 +29,19 @@ namespace Lax544225.PartitionRobustness
 
 open scoped NNReal
 
-open Semimetric Partitions Balls
+open SemimetricSpace Partitions Balls
 /-- Coverage by monochromatic balls whose centers are μ-close to the input. -/
-def Robust {S : Type u} (d : Distance S) (hd : IsSemimetric d)
-    (P : Set (Set S)) (_hP : IsPartition P) (μ ε : ℝ≥0) : Prop :=
+def MuEpsilonRobustPartition {S : Type u} (d : Distance S) (hd : IsSemimetricSpace d)
+    (P : Set (Set S)) (_hP : IsPartition P) (μ : ℝ≥0) (ε : ℝ>0) : Prop :=
   ∀ x, ∃ x', x' ∈ ball d hd x μ ∧ ∃ A ∈ P, x ∈ A ∧ ball d hd x' ε ⊆ A
 
 /-- Distinct parts are separated by distance strictly greater than ε. -/
-def Separated {S : Type u} (d : Distance S) (_hd : IsSemimetric d)
+def Separated {S : Type u} (d : Distance S) (_hd : IsSemimetricSpace d)
     (P : Set (Set S)) (_hP : IsPartition P) (ε : ℝ≥0) : Prop :=
   ∀ A ∈ P, ∀ B ∈ P, A ≠ B → ∀ x ∈ A, ∀ y ∈ B, ε < d x y
 
 /-- Every robust finite partition of the carrier has only the whole carrier as a part. -/
-def OnlyTrivial {S : Type u} (d : Distance S) (hd : IsSemimetric d) (μ ε : ℝ≥0) : Prop :=
-  ∀ P (hP : IsPartition P), Robust d hd P hP μ ε → IsTrivial P
+def OnlyTrivial {S : Type u} (d : Distance S) (hd : IsSemimetricSpace d) (μ : ℝ≥0) (ε : ℝ>0) : Prop :=
+  ∀ P (hP : IsPartition P), MuEpsilonRobustPartition d hd P hP μ ε → IsTrivial P
 
 end Lax544225.PartitionRobustness

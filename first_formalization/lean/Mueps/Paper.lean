@@ -1,4 +1,4 @@
-/- Adapted from lax-544225, source 80545d45f49c9ec084a98a6882ac37409889ee1f.
+/- Adapted from lax-544225, source dbdbc610628949634c5cedeaa81437b2f7ce1293.
    Standalone Lean port, synchronized 11 November 2026: archive assumptions replaced by proved dependencies.
    Formalization: Clemens Kuske and Codex (OpenAI). Apache-2.0. -/
 
@@ -108,23 +108,10 @@ open Mueps
 open scoped NNReal
 open SemimetricSpace Partitions PartitionRobustness
 
-/-- Neither restriction nor gluing preserves the stated triviality properties in general. -/
-theorem lemma1 :
-    (¬ ∀ (S : Type) (d : Distance S) (hd : IsSemimetricSpace d)
-      (μ : ℝ≥0) (ε : ℝ>0) (S₁ : Set S)
-      (hS₁ : IsSemimetricSpace (fun x y : S₁ => d x.val y.val)),
-      S₁ᶜ.Nonempty →
-      OnlyTrivial (fun x y : S₁ => d x.val y.val) hS₁ μ ε →
-      ∀ (P : Set (Set S)) (hP : IsPartition P),
-        MuEpsilonRobustPartition d hd P hP μ ε → ∃ Sᵢ ∈ P, S₁ ⊆ Sᵢ) ∧
-    (¬ ∀ (S : Type) (d : Distance S) (hd : IsSemimetricSpace d)
-      (μ : ℝ≥0) (ε : ℝ>0) (S₁ S₂ : Set S)
-      (hS₁ : IsSemimetricSpace (fun x y : S₁ => d x.val y.val))
-      (hS₂ : IsSemimetricSpace (fun x y : S₂ => d x.val y.val)),
-      S₁ᶜ.Nonempty → S₂ᶜ.Nonempty → (S₁ ∩ S₂).Nonempty → S₁ ∪ S₂ = Set.univ →
-      OnlyTrivial (fun x y : S₁ => d x.val y.val) hS₁ μ ε →
-      OnlyTrivial (fun x y : S₂ => d x.val y.val) hS₂ μ ε →
-      OnlyTrivial d hd μ ε) := by
+open Mueps.Noncompositionality
+
+/-- Neither the restriction principle nor the union principle holds in general. -/
+theorem lemma1 : ¬ RestrictionPrinciple ∧ ¬ UnionPrinciple := by
   exact MuepsProofs.Counterexamples.noncompositionality
 
 end Mueps.Paper.Noncompositionality
@@ -135,12 +122,14 @@ open Mueps
 open scoped NNReal
 open SemimetricSpace Decomposition PartitionRobustness
 
-/-- If a semimetric space has a (μ,ε)-decomposition and each induced subspace admits only trivial (μ,ε)-robust partitions, then the whole space admits only trivial (μ,ε)-robust partitions. -/
-theorem theorem5 {S : Type u} (d : Distance S) (hd : IsSemimetricSpace d) (D : Set (Set S))
-    (μ : ℝ≥0) (ε : ℝ>0) (hD : IsDecomposition d hd D μ)
-    (hlocal : ∀ (Dᵢ : Set S) (_hmem : Dᵢ ∈ D)
-      (hDᵢ : IsSemimetricSpace (fun x y : Dᵢ => d x.val y.val)),
-      OnlyTrivial (fun x y : Dᵢ => d x.val y.val) hDᵢ μ ε) : OnlyTrivial d hd μ ε := by
+/-- Triviality of robust partitions on each decomposition piece implies global triviality. -/
+theorem theorem5 {S : Type u} (d : Distance S) (hd : IsSemimetricSpace d)
+    (D : Set (Set S)) (μ : ℝ≥0) (ε : ℝ>0)
+    (hD : IsDecomposition d hd D μ)
+    (hlocal : ∀ Dᵢ ∈ D,
+      let dᵢ : Distance Dᵢ := fun x y => d x.val y.val
+      ∀ hDᵢ : IsSemimetricSpace dᵢ, OnlyTrivial dᵢ hDᵢ μ ε) :
+    OnlyTrivial d hd μ ε := by
   exact MuepsProofs.Decomposition.decompositionObstruction d hd D μ ε hD hlocal
 
 end Mueps.Paper.DecompositionObstruction
@@ -151,7 +140,7 @@ open Mueps
 open scoped NNReal
 open SemimetricSpace OrderedSemimetric Decomposition PartitionRobustness PrecisionGaps
 
-/-- In a finite partially ordered semimetric space, a (μ,ε)-decomposition into totally ordered pieces admits only trivial robust partitions if ε≥Δᵢδᵢμ+Δᵢ for every piece.
+/-- In a finite partially ordered semimetric space, a μ-decomposition into totally ordered pieces admits only trivial robust partitions if ε≥Δᵢδᵢμ+Δᵢ for every piece.
 
 Singleton pieces have Δᵢ = δᵢ = 0 in the paper, so their bound is automatic.
 Only nontrivial pieces require `hbound`; singleton pieces remain allowed. -/

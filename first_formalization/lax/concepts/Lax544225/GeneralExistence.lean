@@ -33,13 +33,13 @@ universe u
 namespace Lax544225.GeneralExistence
 
 open scoped NNReal
-open Semimetric PartitionRobustness Balls
+open SemimetricSpace PartitionRobustness Balls
 
 /-- The trivial partition is the only robust partition exactly when every nonempty proper cut admits a covering point on one side from ε-balls centered on the other side. -/
-axiom statement {S : Type u} (d : Distance S) (hd : IsSemimetric d)
-    (μ ε : ℝ≥0) (hε : 0 < ε) :
-    OnlyTrivial d hd μ ε ↔ (∀ A : Set S, A.Nonempty → Aᶜ.Nonempty →
-      ∃ x, (x ∈ A ∧ ball d hd x μ ⊆ neighborhood d hd Aᶜ ε) ∨
-        (x ∈ Aᶜ ∧ ball d hd x μ ⊆ neighborhood d hd A ε))
+axiom theorem2 {S : Type u} (d : Distance S) (hd : IsSemimetricSpace d)
+    (μ : ℝ≥0) (ε : ℝ>0) :
+    OnlyTrivial d hd μ ε ↔ (∀ S' : Set S, S'.Nonempty → S'ᶜ.Nonempty →
+      ∃ x, (x ∈ S' ∧ ball d hd x μ ⊆ unionOfBalls d hd S'ᶜ ε) ∨
+        (x ∈ S'ᶜ ∧ ball d hd x μ ⊆ unionOfBalls d hd S' ε))
 
 end Lax544225.GeneralExistence
