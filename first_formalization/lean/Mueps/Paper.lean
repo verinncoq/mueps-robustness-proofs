@@ -1,28 +1,169 @@
-/- Adapted from lax-544225, source 5d812af45275f298dec0e9e4465d6a665e95656b.
-   Standalone Lean port, 18 October 2026: archive assumptions replaced by proved dependencies.
+/- Adapted from lax-544225, source 62ba21d994907b076c31bc2328e0c3209bd1ea17.
+   Standalone Lean port, synchronized 11 November 2026: archive assumptions replaced by proved dependencies.
    Formalization: Clemens Kuske and Codex (OpenAI). Apache-2.0. -/
 
 import MuepsProofs
+import Mathlib.Order.Preorder.Chain
 
-/-! Paper-facing statements. Each is an alias of a complete proof in MuepsProofs. -/
+/-! Paper-facing statements, each proved by the corresponding complete theorem. -/
 
 universe u
-
 
 namespace Mueps.Paper.CoveringCharacterization
 
 open Mueps
 open scoped NNReal
-open Semimetric Partitions PartitionRobustness Balls
+open SemimetricSpace Partitions PartitionRobustness Balls
 
 /-- A finite partition is (μ,ε)-robust exactly when no μ-ball centered in a part is covered by ε-balls from its complement. -/
-theorem from_paper {S : Type u} (d : Distance S) (hd : IsSemimetric d) (P : Set (Set S))
-    (hP : IsPartition P) (μ ε : ℝ≥0) (hε : 0 < ε) :
-    Robust d hd P hP μ ε ↔ (∀ A ∈ P, ∀ x ∈ A, ¬ ball d hd x μ ⊆ neighborhood d hd Aᶜ ε) := by
-  exact MuepsProofs.MainResults.coveringCharacterization d hd P hP μ ε hε
+theorem theorem1 {S : Type u} (d : Distance S) (hd : IsSemimetricSpace d) (P : Set (Set S))
+    (hP : IsPartition P) (μ : ℝ≥0) (ε : ℝ>0) :
+    MuEpsilonRobustPartition d hd P hP μ ε ↔ (∀ Sᵢ ∈ P, ∀ x ∈ Sᵢ, ¬ ball d hd x μ ⊆ unionOfBalls d hd Sᵢᶜ ε) := by
+  exact MuepsProofs.MainResults.coveringCharacterization d hd P hP μ ε
 
 end Mueps.Paper.CoveringCharacterization
 
+namespace Mueps.Paper.GeneralExistence
+
+open Mueps
+open scoped NNReal
+open SemimetricSpace PartitionRobustness Balls
+
+/-- The trivial partition is the only robust partition exactly when every nonempty proper cut admits a covering point on one side from ε-balls centered on the other side. -/
+theorem theorem2 {S : Type u} (d : Distance S) (hd : IsSemimetricSpace d)
+    (μ : ℝ≥0) (ε : ℝ>0) :
+    OnlyTrivial d hd μ ε ↔ (∀ S' : Set S, S'.Nonempty → S'ᶜ.Nonempty →
+      ∃ x, (x ∈ S' ∧ ball d hd x μ ⊆ unionOfBalls d hd S'ᶜ ε) ∨
+        (x ∈ S'ᶜ ∧ ball d hd x μ ⊆ unionOfBalls d hd S' ε)) := by
+  exact MuepsProofs.MainResults.generalExistence d hd μ ε
+
+end Mueps.Paper.GeneralExistence
+
+namespace Mueps.Paper.BoundaryCoveringCharacterization
+
+open Mueps
+open scoped NNReal
+open SemimetricSpace OrderedSemimetric Balls Boundary
+
+/-- In a finite totally ordered semimetric space, covering every proper cut is equivalent to covering its within-side μ-ball from the opposite boundary. -/
+theorem theorem3 {S : Type u} [Finite S] [LinearOrder S] (d : Distance S)
+    (hd : IsOrderedSemimetricSpace d (· ≤ ·)) (μ : ℝ≥0) (ε : ℝ>0) :
+    (∀ S' : Set S, S'.Nonempty → S'ᶜ.Nonempty →
+      ∃ x, (x ∈ S' ∧ ball d hd.1 x μ ⊆ unionOfBalls d hd.1 S'ᶜ ε) ∨
+        (x ∈ S'ᶜ ∧ ball d hd.1 x μ ⊆ unionOfBalls d hd.1 S' ε)) ↔ (∀ S' : Set S, S'.Nonempty → S'ᶜ.Nonempty →
+      ∃ x, (x ∈ S' ∧ ball d hd.1 x μ ∩ S' ⊆ unionOfBalls d hd.1 (boundary S'ᶜ) ε) ∨
+        (x ∈ S'ᶜ ∧ ball d hd.1 x μ ∩ S'ᶜ ⊆ unionOfBalls d hd.1 (boundary S') ε)) := by
+  exact MuepsProofs.MainResults.boundaryCoveringCharacterization d hd μ ε
+
+end Mueps.Paper.BoundaryCoveringCharacterization
+
+namespace Mueps.Paper.BoundaryExistence
+
+open Mueps
+open scoped NNReal
+open SemimetricSpace OrderedSemimetric PartitionRobustness Boundary Balls
+
+/-- In a finite totally ordered semimetric space, only-trivial robustness is equivalent to opposite-boundary covering of every nonempty proper cut. -/
+theorem corollary1 {S : Type u} [Finite S] [LinearOrder S] (d : Distance S)
+    (hd : IsOrderedSemimetricSpace d (· ≤ ·)) (μ : ℝ≥0) (ε : ℝ>0) :
+    OnlyTrivial d hd.1 μ ε ↔ (∀ S' : Set S, S'.Nonempty → S'ᶜ.Nonempty →
+      ∃ x, (x ∈ S' ∧ ball d hd.1 x μ ∩ S' ⊆ unionOfBalls d hd.1 (boundary S'ᶜ) ε) ∨
+        (x ∈ S'ᶜ ∧ ball d hd.1 x μ ∩ S'ᶜ ⊆ unionOfBalls d hd.1 (boundary S') ε)) := by
+  exact MuepsProofs.MainResults.boundaryExistence d hd μ ε
+
+end Mueps.Paper.BoundaryExistence
+
+namespace Mueps.Paper.SuccessorCovering
+
+open Mueps
+open scoped NNReal
+open SemimetricSpace OrderedSemimetric Balls Boundary PrecisionGaps
+
+/-- In a finite totally ordered semimetric space, ε≥Δδμ+Δ implies B(x,μ)⊆B(x',ε) whenever x' is the immediate successor of x. -/
+theorem theorem4 {S : Type u} [Finite S] [LinearOrder S] [Nontrivial S] (d : Distance S)
+    (hd : IsOrderedSemimetricSpace d (· ≤ ·)) (μ : ℝ≥0) (ε : ℝ>0)
+    (hbound : threshold d hd μ ≤ ε) (x x' : S) (hsucc : Successor x x') :
+    ball d hd.1 x μ ⊆ ball d hd.1 x' ε := by
+  exact MuepsProofs.OrderedBounds.successorCovering d hd μ ε hbound x x' hsucc
+
+end Mueps.Paper.SuccessorCovering
+
+namespace Mueps.Paper.PrecisionObstruction
+
+open Mueps
+open scoped NNReal
+open SemimetricSpace OrderedSemimetric PartitionRobustness PrecisionGaps
+
+/-- In a finite totally ordered semimetric space, ε≥Δδμ+Δ forces every (μ,ε)-robust partition to be trivial. -/
+theorem corollary2 {S : Type u} [Finite S] [LinearOrder S] [Nontrivial S] (d : Distance S)
+    (hd : IsOrderedSemimetricSpace d (· ≤ ·)) (μ : ℝ≥0) (ε : ℝ>0)
+    (hbound : threshold d hd μ ≤ ε) : OnlyTrivial d hd.1 μ ε := by
+  exact MuepsProofs.OrderedBounds.precisionObstruction d hd μ ε hbound
+
+end Mueps.Paper.PrecisionObstruction
+
+namespace Mueps.Paper.Noncompositionality
+
+open Mueps
+open scoped NNReal
+open SemimetricSpace Partitions PartitionRobustness
+
+/-- Neither restriction nor gluing preserves the stated triviality properties in general. -/
+theorem lemma1 :
+    (¬ ∀ (S : Type) (d : Distance S) (hd : IsSemimetricSpace d)
+      (μ : ℝ≥0) (ε : ℝ>0) (S₁ : Set S)
+      (hS₁ : IsSemimetricSpace (fun x y : S₁ => d x.val y.val)),
+      S₁ᶜ.Nonempty →
+      OnlyTrivial (fun x y : S₁ => d x.val y.val) hS₁ μ ε →
+      ∀ (P : Set (Set S)) (hP : IsPartition P),
+        MuEpsilonRobustPartition d hd P hP μ ε → ∃ Sᵢ ∈ P, S₁ ⊆ Sᵢ) ∧
+    (¬ ∀ (S : Type) (d : Distance S) (hd : IsSemimetricSpace d)
+      (μ : ℝ≥0) (ε : ℝ>0) (S₁ S₂ : Set S)
+      (hS₁ : IsSemimetricSpace (fun x y : S₁ => d x.val y.val))
+      (hS₂ : IsSemimetricSpace (fun x y : S₂ => d x.val y.val)),
+      S₁ᶜ.Nonempty → S₂ᶜ.Nonempty → (S₁ ∩ S₂).Nonempty → S₁ ∪ S₂ = Set.univ →
+      OnlyTrivial (fun x y : S₁ => d x.val y.val) hS₁ μ ε →
+      OnlyTrivial (fun x y : S₂ => d x.val y.val) hS₂ μ ε →
+      OnlyTrivial d hd μ ε) := by
+  exact MuepsProofs.Counterexamples.noncompositionality
+
+end Mueps.Paper.Noncompositionality
+
+namespace Mueps.Paper.DecompositionObstruction
+
+open Mueps
+open scoped NNReal
+open SemimetricSpace Decomposition PartitionRobustness
+
+/-- If a semimetric space has a (μ,ε)-decomposition and each induced subspace admits only trivial (μ,ε)-robust partitions, then the whole space admits only trivial (μ,ε)-robust partitions. -/
+theorem theorem5 {S : Type u} (d : Distance S) (hd : IsSemimetricSpace d) (D : Set (Set S))
+    (μ : ℝ≥0) (ε : ℝ>0) (hD : IsDecomposition d hd D μ)
+    (hlocal : ∀ (Dᵢ : Set S) (_hmem : Dᵢ ∈ D)
+      (hDᵢ : IsSemimetricSpace (fun x y : Dᵢ => d x.val y.val)),
+      OnlyTrivial (fun x y : Dᵢ => d x.val y.val) hDᵢ μ ε) : OnlyTrivial d hd μ ε := by
+  exact MuepsProofs.Decomposition.decompositionObstruction d hd D μ ε hD hlocal
+
+end Mueps.Paper.DecompositionObstruction
+
+namespace Mueps.Paper.PartialOrderPrecisionBound
+
+open Mueps
+open scoped NNReal
+open SemimetricSpace OrderedSemimetric Decomposition PartitionRobustness PrecisionGaps
+
+/-- In a finite partially ordered semimetric space, a (μ,ε)-decomposition into totally ordered pieces admits only trivial robust partitions if ε≥Δᵢδᵢμ+Δᵢ for every piece. -/
+theorem corollary3 {S : Type u} [Finite S] [PartialOrder S] [Nontrivial S] (d : Distance S)
+    (hd : IsOrderedSemimetricSpace d (· ≤ ·)) (D : Set (Set S)) (μ : ℝ≥0) (ε : ℝ>0)
+    (hD : IsDecomposition d hd.1 D μ)
+    (hchain : ∀ Dᵢ ∈ D, IsChain (· ≤ ·) Dᵢ)
+    (hsize : ∀ Dᵢ ∈ D, Nontrivial Dᵢ)
+    (hbound : ∀ (Dᵢ : Set S) (_hmem : Dᵢ ∈ D)
+      [Std.Total (α := Dᵢ) (· ≤ ·)] [Nontrivial Dᵢ]
+      (hDᵢ : IsOrderedSemimetricSpace (fun x y : Dᵢ => d x.val y.val) (· ≤ ·)),
+      threshold (fun x y : Dᵢ => d x.val y.val) hDᵢ μ ≤ ε) : OnlyTrivial d hd.1 μ ε := by
+  exact MuepsProofs.Decomposition.partialOrderPrecisionBound d hd D μ ε hD hchain hsize hbound
+
+end Mueps.Paper.PartialOrderPrecisionBound
 
 namespace Mueps.Paper.FloatAbsoluteSpace
 
@@ -32,11 +173,10 @@ open scoped NNReal
 open Mueps.FloatAbsoluteSpace
 
 /-- The absolute-distance construction is an ordered semimetric space. -/
-theorem from_paper (F : Format) : IsOrdered (absDistance F) (ieeeLe F) := by
+theorem proposition1_absolute (F : Format) : IsOrderedSemimetricSpace (absDistance F) (ieeeLe F) := by
   exact MuepsProofs.FloatEmbedding.floatAbsoluteSpace F
 
 end Mueps.Paper.FloatAbsoluteSpace
-
 
 namespace Mueps.Paper.FloatSquaredSpace
 
@@ -46,203 +186,58 @@ open scoped NNReal
 open Mueps.FloatSquaredSpace
 
 /-- The squared-distance construction is an ordered semimetric space. -/
-theorem from_paper (F : Format) : IsOrdered (squareDistance F) (ieeeLe F) := by
+theorem proposition1_squared (F : Format) : IsOrderedSemimetricSpace (squareDistance F) (ieeeLe F) := by
   exact MuepsProofs.FloatEmbedding.floatSquaredSpace F
 
 end Mueps.Paper.FloatSquaredSpace
 
-
 namespace Mueps.Paper.SumProductSpace
 
 open Mueps
-open Semimetric OrderedSemimetric
+open SemimetricSpace OrderedSemimetric
 open scoped BigOperators
 open Mueps.SumProductSpace
 
 /-- Sum products preserve ordered semimetric spaces. -/
-theorem from_paper {S : Type u} (d : Distance S) (le : S → S → Prop)
-    (hd : IsOrdered d le) (n : ℕ) : IsOrdered (sumDistance d n) (productLe le n) := by
+theorem proposition1_sumProduct {S : Type u} (d : Distance S) (le : S → S → Prop)
+    (hd : IsOrderedSemimetricSpace d le) (n : ℕ) : IsOrderedSemimetricSpace (sumDistance d n) (productLe le n) := by
   exact MuepsProofs.sumProductSpace d le hd n
 
 end Mueps.Paper.SumProductSpace
 
-
 namespace Mueps.Paper.MaximumProductSpace
 
 open Mueps
-open Semimetric OrderedSemimetric SumProductSpace
+open SemimetricSpace OrderedSemimetric SumProductSpace
 open Mueps.MaximumProductSpace
 
 /-- Synchronized maximum products preserve ordered semimetric spaces. -/
-theorem from_paper {S : Type u} (d : Distance S) (le : S → S → Prop)
-    (hd : IsOrdered d le) (hadd : Additive d le) (n : ℕ) :
-    IsOrdered (maxDistance d n) (synchronizedLe d le n) := by
+theorem proposition1_maximumProduct {S : Type u} (d : Distance S) (le : S → S → Prop)
+    (hd : IsOrderedSemimetricSpace d le) (hadd : Additive d le) (n : ℕ) :
+    IsOrderedSemimetricSpace (maxDistance d n) (synchronizedLe d le n) := by
   exact MuepsProofs.maximumProductSpace d le hd hadd n
 
 end Mueps.Paper.MaximumProductSpace
-
 
 namespace Mueps.Paper.ListSpaces
 
 open Mueps
 open scoped NNReal
-open Semimetric OrderedSemimetric
+open SemimetricSpace OrderedSemimetric
 open scoped BigOperators
 open Mueps.ListSpaces
 
-/-- Both padded-list constructions are ordered semimetric spaces. -/
-theorem from_paper :
-    (∀ {S : Type u} (d : Distance S) (le : S → S → Prop),
-      IsOrdered d le → ∀ pad : S,
-        IsOrdered (Mueps.ListSpaces.sumDistance d pad) (Mueps.ListSpaces.listLe le pad)) ∧
-    (∀ {S : Type u} (d : Distance S) (le : S → S → Prop),
-      IsOrdered d le → Additive d le → ∀ pad : S,
-        IsOrdered (Mueps.ListSpaces.maxDistance d pad)
-          (Mueps.ListSpaces.synchronizedListLe d le pad)) := by
-  exact MuepsProofs.listSpaces
+/-- The sum-distance list extension is an ordered semimetric space. -/
+theorem proposition1_sumList {S : Type u} (d : Distance S)
+    (le : S → S → Prop) (hd : IsOrderedSemimetricSpace d le) (pad : S) :
+    IsOrderedSemimetricSpace (sumDistance d pad) (listLe le pad) := by
+  exact MuepsProofs.sumListSpace d le hd pad
+
+/-- The maximum-distance list extension is ordered when the base is additive. -/
+theorem proposition1_maximumList {S : Type u} (d : Distance S)
+    (le : S → S → Prop) (hd : IsOrderedSemimetricSpace d le)
+    (hadd : Additive d le) (pad : S) :
+    IsOrderedSemimetricSpace (maxDistance d pad) (synchronizedListLe d le pad) := by
+  exact MuepsProofs.maximumListSpace d le hd hadd pad
 
 end Mueps.Paper.ListSpaces
-
-
-namespace Mueps.Paper.GeneralExistence
-
-open Mueps
-open scoped NNReal
-open Semimetric PartitionRobustness Balls
-
-/-- The trivial partition is the only robust partition exactly when every nonempty proper cut admits a covering point on one side from ε-balls centered on the other side. -/
-theorem from_paper {S : Type u} (d : Distance S) (hd : IsSemimetric d)
-    (μ ε : ℝ≥0) (hε : 0 < ε) :
-    OnlyTrivial d hd μ ε ↔ (∀ A : Set S, A.Nonempty → Aᶜ.Nonempty →
-      ∃ x, (x ∈ A ∧ ball d hd x μ ⊆ neighborhood d hd Aᶜ ε) ∨
-        (x ∈ Aᶜ ∧ ball d hd x μ ⊆ neighborhood d hd A ε)) := by
-  exact MuepsProofs.MainResults.generalExistence d hd μ ε hε
-
-end Mueps.Paper.GeneralExistence
-
-
-namespace Mueps.Paper.BoundaryCoveringCharacterization
-
-open Mueps
-open scoped NNReal
-open Semimetric OrderedSemimetric Balls Boundary
-
-/-- In a finite totally ordered semimetric space, covering every proper cut is equivalent to covering its within-side μ-ball from the opposite boundary. -/
-theorem from_paper {S : Type u} [Finite S] [LinearOrder S] (d : Distance S)
-    (hd : IsOrdered d (· ≤ ·)) (μ ε : ℝ≥0) (hε : 0 < ε) :
-    (∀ A : Set S, A.Nonempty → Aᶜ.Nonempty →
-      ∃ x, (x ∈ A ∧ ball d hd.1 x μ ⊆ neighborhood d hd.1 Aᶜ ε) ∨
-        (x ∈ Aᶜ ∧ ball d hd.1 x μ ⊆ neighborhood d hd.1 A ε)) ↔ (∀ A : Set S, A.Nonempty → Aᶜ.Nonempty →
-      ∃ x, (x ∈ A ∧ ball d hd.1 x μ ∩ A ⊆ neighborhood d hd.1 (complementBoundary A) ε) ∨
-        (x ∈ Aᶜ ∧ ball d hd.1 x μ ∩ Aᶜ ⊆ neighborhood d hd.1 (boundary A) ε)) := by
-  exact MuepsProofs.MainResults.boundaryCoveringCharacterization d hd μ ε hε
-
-end Mueps.Paper.BoundaryCoveringCharacterization
-
-
-namespace Mueps.Paper.BoundaryExistence
-
-open Mueps
-open scoped NNReal
-open Semimetric OrderedSemimetric PartitionRobustness Boundary Balls
-
-/-- In a finite totally ordered semimetric space, only-trivial robustness is equivalent to opposite-boundary covering of every nonempty proper cut. -/
-theorem from_paper {S : Type u} [Finite S] [LinearOrder S] (d : Distance S)
-    (hd : IsOrdered d (· ≤ ·)) (μ ε : ℝ≥0) (hε : 0 < ε) :
-    OnlyTrivial d hd.1 μ ε ↔ (∀ A : Set S, A.Nonempty → Aᶜ.Nonempty →
-      ∃ x, (x ∈ A ∧ ball d hd.1 x μ ∩ A ⊆ neighborhood d hd.1 (complementBoundary A) ε) ∨
-        (x ∈ Aᶜ ∧ ball d hd.1 x μ ∩ Aᶜ ⊆ neighborhood d hd.1 (boundary A) ε)) := by
-  exact MuepsProofs.MainResults.boundaryExistence d hd μ ε hε
-
-end Mueps.Paper.BoundaryExistence
-
-
-namespace Mueps.Paper.SuccessorCovering
-
-open Mueps
-open scoped NNReal
-open Semimetric OrderedSemimetric Balls Boundary PrecisionGaps
-
-/-- In a finite totally ordered semimetric space, ε≥Δδμ+Δ implies B(x,μ)⊆B(y,ε) whenever y is the immediate successor of x. -/
-theorem from_paper {S : Type u} [Finite S] [LinearOrder S] (d : Distance S)
-    (hd : IsOrdered d (· ≤ ·)) (μ ε : ℝ≥0) (hε : 0 < ε)
-    (hbound : threshold d hd μ ≤ ε) (x y : S) (hxy : Successor x y) :
-    ball d hd.1 x μ ⊆ ball d hd.1 y ε := by
-  exact MuepsProofs.OrderedBounds.successorCovering d hd μ ε hε hbound x y hxy
-
-end Mueps.Paper.SuccessorCovering
-
-
-namespace Mueps.Paper.PrecisionObstruction
-
-open Mueps
-open scoped NNReal
-open Semimetric OrderedSemimetric PartitionRobustness PrecisionGaps
-
-/-- In a finite totally ordered semimetric space, ε≥Δδμ+Δ forces every (μ,ε)-robust partition to be trivial. -/
-theorem from_paper {S : Type u} [Finite S] [LinearOrder S] (d : Distance S)
-    (hd : IsOrdered d (· ≤ ·)) (μ ε : ℝ≥0) (hε : 0 < ε)
-    (hbound : threshold d hd μ ≤ ε) : OnlyTrivial d hd.1 μ ε := by
-  exact MuepsProofs.OrderedBounds.precisionObstruction d hd μ ε hε hbound
-
-end Mueps.Paper.PrecisionObstruction
-
-
-namespace Mueps.Paper.Noncompositionality
-
-open Mueps
-open Semimetric Partitions PartitionRobustness
-
-/-- Counterexamples to both compositionality implications in Lemma 1. -/
-theorem from_paper :
-    (∃ (d : Distance (Fin 4)) (hd : IsSemimetric d)
-      (P : Set (Set (Fin 4))) (hP : IsPartition P) (A : Set (Fin 4)),
-    Robust d hd P hP 1 1 ∧ A.Nonempty ∧ Aᶜ.Nonempty ∧
-    (∀ hA : IsSemimetric (fun x y : A => d x.val y.val),
-      OnlyTrivial (fun x y : A => d x.val y.val) hA 1 1) ∧
-    ¬ ∃ B ∈ P, A ⊆ B) ∧
-    (∃ (d : Distance (Fin 4)) (hd : IsSemimetric d)
-      (A B : Set (Fin 4)) (P : Set (Set (Fin 4))) (hP : IsPartition P),
-    Aᶜ.Nonempty ∧ Bᶜ.Nonempty ∧ (A ∩ B).Nonempty ∧ A ∪ B = Set.univ ∧
-    (∀ hA : IsSemimetric (fun x y : A => d x.val y.val),
-      OnlyTrivial (fun x y : A => d x.val y.val) hA 1 1) ∧
-    (∀ hB : IsSemimetric (fun x y : B => d x.val y.val),
-      OnlyTrivial (fun x y : B => d x.val y.val) hB 1 1) ∧
-    Robust d hd P hP 1 1 ∧ ¬ IsTrivial P) := by
-  exact MuepsProofs.Counterexamples.noncompositionality
-
-end Mueps.Paper.Noncompositionality
-
-
-namespace Mueps.Paper.DecompositionObstruction
-
-open Mueps
-open scoped NNReal
-open Semimetric Decomposition PartitionRobustness
-
-/-- If a semimetric space has a (μ,ε)-decomposition and each induced subspace admits only trivial (μ,ε)-robust partitions, then the whole space admits only trivial (μ,ε)-robust partitions. -/
-theorem from_paper {S : Type u} (d : Distance S) (hd : IsSemimetric d) (D : Set (Set S))
-    (μ ε : ℝ≥0) (hε : 0 < ε) (hD : IsDecomposition d hd D μ)
-    (hlocal : ∀ A ∈ D, ∀ hA : IsSemimetric (fun x y : A => d x.val y.val),
-      OnlyTrivial (fun x y : A => d x.val y.val) hA μ ε) : OnlyTrivial d hd μ ε := by
-  exact MuepsProofs.Decomposition.decompositionObstruction d hd D μ ε hε hD hlocal
-
-end Mueps.Paper.DecompositionObstruction
-
-
-namespace Mueps.Paper.PartialOrderPrecisionBound
-
-open Mueps
-open scoped NNReal
-open Semimetric OrderedSemimetric Decomposition PartitionRobustness PrecisionGaps
-
-/-- In a finite partially ordered semimetric space, a (μ,ε)-decomposition into totally ordered pieces admits only trivial robust partitions if ε≥Δᵢδᵢμ+Δᵢ for every piece. -/
-theorem from_paper {S : Type u} [Finite S] [PartialOrder S] (d : Distance S)
-    (hd : IsOrdered d (· ≤ ·)) (D : Set (Set S)) (μ ε : ℝ≥0) (hε : 0 < ε)
-    (hD : IsDecomposition d hd.1 D μ)
-    (hchain : ∀ A ∈ D, ∀ x ∈ A, ∀ y ∈ A, x ≤ y ∨ y ≤ x)
-    (hbound : ∀ A ∈ D, ∀ hA : IsOrdered (fun x y : A => d x.val y.val) (· ≤ ·),
-      threshold (fun x y : A => d x.val y.val) hA μ ≤ ε) : OnlyTrivial d hd.1 μ ε := by
-  exact MuepsProofs.Decomposition.partialOrderPrecisionBound d hd D μ ε hε hD hchain hbound
-
-end Mueps.Paper.PartialOrderPrecisionBound

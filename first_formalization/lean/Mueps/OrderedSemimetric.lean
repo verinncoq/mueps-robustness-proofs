@@ -1,8 +1,8 @@
-/- Adapted from lax-544225, source 5d812af45275f298dec0e9e4465d6a665e95656b.
-   Standalone Lean port, 18 October 2026: archive assumptions replaced by proved dependencies.
+/- Adapted from lax-544225, source 62ba21d994907b076c31bc2328e0c3209bd1ea17.
+   Standalone Lean port, synchronized 11 November 2026: archive assumptions replaced by proved dependencies.
    Formalization: Clemens Kuske and Codex (OpenAI). Apache-2.0. -/
 
-import Mueps.Semimetric
+import Mueps.SemimetricSpace
 import Mathlib.Order.Defs.PartialOrder
 
 /-!
@@ -18,7 +18,7 @@ $$a\leq b\leq c\quad\Longrightarrow\quad d(a,c)\geq d(a,b)+d(b,c).$$
 
 # Formalization notes
 
-The order is an explicit non-strict relation. IsPartialOrder provides reflexivity, transitivity, and antisymmetry. The reverse triangle inequality is imposed only on ordered chains. Additivity is an additional property needed for synchronized maximum distances.
+The order is an explicit non-strict relation. Mathlib’s `IsPartialOrder` provides reflexivity, transitivity, and antisymmetry. The reverse triangle inequality is imposed only on ordered chains. Additivity is an additional property needed for synchronized maximum distances.
 
 The auxiliary `Additive` predicate replaces the chain inequality by equality.
 -/
@@ -27,10 +27,10 @@ universe u
 
 namespace Mueps.OrderedSemimetric
 
-open Semimetric
+open SemimetricSpace
 /-- The semimetric, partial-order, and ordered-chain distance laws. -/
-def IsOrdered {S : Type u} (d : Distance S) (le : S → S → Prop) : Prop :=
-  IsSemimetric d ∧ IsPartialOrder S le ∧
+def IsOrderedSemimetricSpace {S : Type u} (d : Distance S) (le : S → S → Prop) : Prop :=
+  IsSemimetricSpace d ∧ IsPartialOrder S le ∧
     (∀ a b c, le a b → le b c → d a b + d b c ≤ d a c)
 
 /-- Exact additivity of distance along the given ordered chains. -/

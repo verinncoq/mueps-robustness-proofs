@@ -1,5 +1,5 @@
-/- Adapted from lax-544225, source 5d812af45275f298dec0e9e4465d6a665e95656b.
-   Standalone Lean port, 18 October 2026: archive assumptions replaced by proved dependencies.
+/- Adapted from lax-544225, source 62ba21d994907b076c31bc2328e0c3209bd1ea17.
+   Standalone Lean port, synchronized 11 November 2026: archive assumptions replaced by proved dependencies.
    Formalization: Clemens Kuske and Codex (OpenAI). Apache-2.0. -/
 
 import Mueps.Balls
@@ -22,7 +22,7 @@ A collection of nonempty sets $D:=\{D_1,\dots,D_p\}$ is a
 
 # Formalization notes
 
-The definition depends only on μ; ε appears in the applications. ReflTransGen encodes a finite chain, including a chain consisting of a single member. Membership of each endpoint member and each link is explicit. Finiteness concerns the family, not the sizes of its members.
+The definition depends only on μ; ε appears in the applications. `Chain D A B` names a finite overlap chain, including a chain consisting of a single member. Membership of each endpoint member and each link is explicit. Finiteness concerns the family, not the sizes of its members.
 -/
 
 universe u
@@ -31,13 +31,18 @@ namespace Mueps.Decomposition
 
 open scoped NNReal
 
-open Semimetric Balls
+open SemimetricSpace Balls
+/-- A finite chain of overlap steps between members of D, allowing zero steps. -/
+def Chain {S : Type u} (D : Set (Set S)) (A B : Set S) : Prop :=
+  A ∈ D ∧ B ∈ D ∧
+    Relation.ReflTransGen (fun C E => C ∈ D ∧ E ∈ D ∧ (C ∩ E).Nonempty) A B
+
 /-- A finite family of nonempty μ-closed pieces connected by overlaps. -/
-def IsDecomposition {S : Type u} (d : Distance S) (hd : IsSemimetric d)
+def IsDecomposition {S : Type u} (d : Distance S) (hd : IsSemimetricSpace d)
     (D : Set (Set S)) (μ : ℝ≥0) : Prop :=
   D.Finite ∧ (∀ A ∈ D, A.Nonempty) ∧
     (∀ A ∈ D, ∀ x ∈ A, ball d hd x μ ⊆ A) ∧
     (∀ x y, ∃ A ∈ D, ∃ B ∈ D, x ∈ A ∧ y ∈ B ∧
-      Relation.ReflTransGen (fun C E => C ∈ D ∧ E ∈ D ∧ (C ∩ E).Nonempty) A B)
+      Chain D A B)
 
 end Mueps.Decomposition

@@ -1,5 +1,5 @@
-/- Adapted from lax-544225, source 5d812af45275f298dec0e9e4465d6a665e95656b.
-   Standalone Lean port, 18 October 2026: archive assumptions replaced by proved dependencies.
+/- Adapted from lax-544225, source 62ba21d994907b076c31bc2328e0c3209bd1ea17.
+   Standalone Lean port, synchronized 11 November 2026: archive assumptions replaced by proved dependencies.
    Formalization: Clemens Kuske and Codex (OpenAI). Apache-2.0. -/
 
 import Mueps.Balls
@@ -22,7 +22,7 @@ $$\overline{\partial}S':=\{x\notin S'\mid\exists y\in S',\ Succ(x,y)\lor Succ(y,
 
 # Formalization notes
 
-Successor is the standard mathlib cover relation `CovBy`, with the paper's name retained as an alias.
+Successor is the standard mathlib cover relation `CovBy`, with the paper's name retained as an alias. The complement boundary is written directly as `boundary S'ᶜ`.
 
 -/
 
@@ -32,17 +32,13 @@ namespace Mueps.Boundary
 
 open scoped NNReal
 
-open Semimetric Balls
+open SemimetricSpace Balls
 /-- Consecutive points in a linear order. -/
 abbrev Successor {S : Type u} [LinearOrder S] (x y : S) : Prop :=
   CovBy x y
 
-/-- Points of A adjacent to its complement in the ambient order. -/
-def boundary {S : Type u} [LinearOrder S] (A : Set S) : Set S :=
-  {x | x ∈ A ∧ ∃ y ∈ Aᶜ, Successor x y ∨ Successor y x}
-
-/-- Points outside A adjacent to A in the ambient order. -/
-def complementBoundary {S : Type u} [LinearOrder S] (A : Set S) : Set S :=
-  boundary Aᶜ
+/-- Points of S' adjacent to its complement in the ambient order. -/
+def boundary {S : Type u} [LinearOrder S] (S' : Set S) : Set S :=
+  {x | x ∈ S' ∧ ∃ y ∈ S'ᶜ, Successor x y ∨ Successor y x}
 
 end Mueps.Boundary

@@ -1,5 +1,5 @@
-/- Adapted from lax-544225, source 5d812af45275f298dec0e9e4465d6a665e95656b.
-   Standalone Lean port, 18 October 2026: archive assumptions replaced by proved dependencies.
+/- Adapted from lax-544225, source 62ba21d994907b076c31bc2328e0c3209bd1ea17.
+   Standalone Lean port, synchronized 11 November 2026: archive assumptions replaced by proved dependencies.
    Formalization: Clemens Kuske and Codex (OpenAI). Apache-2.0. -/
 
 import Mueps.Definitions
@@ -7,11 +7,12 @@ import MuepsProofs.PrecisionObstruction
 import MuepsProofs.SubspaceDistance
 import MuepsProofs.Basic
 import Mathlib.Data.Set.Finite.Basic
+import Mathlib.Order.Preorder.Chain
 
 universe u
 namespace MuepsProofs.Decomposition
 open scoped NNReal
-open Mueps Semimetric Partitions PartitionRobustness Balls Decomposition OrderedSemimetric PrecisionGaps
+open Mueps SemimetricSpace Partitions PartitionRobustness Balls Decomposition OrderedSemimetric PrecisionGaps
 
 private def trace {S : Type u} (A B : Set S) : Set A := {x | x.val ∈ B}
 private def traceFamily {S : Type u} (A : Set S) (P : Set (Set S)) : Set (Set A) :=
@@ -31,11 +32,11 @@ private lemma trace_partition {S : Type u} (A : Set S) {P : Set (Set S)}
     have hEB : E = B := hu E ⟨hE.1, hxE⟩
     rw [hEB]
 
-private lemma trace_robust {S : Type u} (d : Distance S) (hd : IsSemimetric d)
-    {P : Set (Set S)} (hP : IsPartition P) (A : Set S) (hA : IsSemimetric (restrict d A))
-    (μ ε : ℝ≥0) (hrob : Robust d hd P hP μ ε)
+private lemma trace_robust {S : Type u} (d : Distance S) (hd : IsSemimetricSpace d)
+    {P : Set (Set S)} (hP : IsPartition P) (A : Set S) (hA : IsSemimetricSpace (restrict d A))
+    (μ : ℝ≥0) (ε : ℝ>0) (hrob : MuEpsilonRobustPartition d hd P hP μ ε)
     (hclosed : ∀ x ∈ A, ball d hd x μ ⊆ A) :
-    Robust (restrict d A) hA (traceFamily A P) (trace_partition A hP) μ ε := by
+    MuEpsilonRobustPartition (restrict d A) hA (traceFamily A P) (trace_partition A hP) μ ε := by
   intro x
   obtain ⟨y, hxy, B, hB, hxB, hball⟩ := hrob x.val
   have hyA := hclosed x.val x.property hxy
@@ -45,8 +46,8 @@ private lemma trace_robust {S : Type u} (d : Distance S) (hd : IsSemimetric d)
     exact hball hz
 
 private lemma piece_monochromatic {S : Type u} (d : Distance S)
-    (hd : IsSemimetric d) {P : Set (Set S)} (hP : IsPartition P) (μ ε : ℝ≥0)
-    (hrob : Robust d hd P hP μ ε) (A : Set S) (hA : IsSemimetric (restrict d A))
+    (hd : IsSemimetricSpace d) {P : Set (Set S)} (hP : IsPartition P) (μ : ℝ≥0) (ε : ℝ>0)
+    (hrob : MuEpsilonRobustPartition d hd P hP μ ε) (A : Set S) (hA : IsSemimetricSpace (restrict d A))
     (hclosed : ∀ x ∈ A, ball d hd x μ ⊆ A)
     (hlocal : OnlyTrivial (restrict d A) hA μ ε) :
     ∀ B ∈ P, (A ∩ B).Nonempty → A ⊆ B := by
@@ -76,16 +77,16 @@ part to any input, forcing that part to be the whole carrier.
 
 Theorem 5 of Aleksandrov, Kuske and Völlinger, *(μ,ε)-Robustness: Characterization, Existence, and Precision-Dependent Bounds*, revised FSEN 2027 manuscript (9 November 2026).
 -/
-theorem decompositionObstruction {S : Type u} (d : Distance S) (hd : IsSemimetric d)
-    (D : Set (Set S)) (μ ε : ℝ≥0) (_hε : 0 < ε)
+theorem decompositionObstruction {S : Type u} (d : Distance S) (hd : IsSemimetricSpace d)
+    (D : Set (Set S)) (μ : ℝ≥0) (ε : ℝ>0)
     (hD : IsDecomposition d hd D μ)
-    (hlocal : ∀ A ∈ D, ∀ hA : IsSemimetric (restrict d A),
+    (hlocal : ∀ A ∈ D, ∀ hA : IsSemimetricSpace (restrict d A),
       OnlyTrivial (restrict d A) hA μ ε) : OnlyTrivial d hd μ ε := by
   classical
   intro P hP hrob
   have hmono : ∀ A ∈ D, ∀ B ∈ P, (A ∩ B).Nonempty → A ⊆ B := by
     intro A hA
-    have hsm : IsSemimetric (restrict d A) :=
+    have hsm : IsSemimetricSpace (restrict d A) :=
       restrict_isSemimetric d hd A (hD.2.1 A hA)
     exact piece_monochromatic d hd hP μ ε hrob A hsm (hD.2.2.1 A hA)
       (hlocal A hA hsm)
@@ -98,11 +99,13 @@ theorem decompositionObstruction {S : Type u} (d : Distance S) (hd : IsSemimetri
     have hstart : A ⊆ B := hmono A hA B hB ⟨x, hxA, hx⟩
     have hend : E ⊆ B := by
       clear hyE hE
+      unfold Chain at hpath
+      rcases hpath with ⟨_, _, hpath⟩
       induction hpath with
       | refl => exact hstart
       | @tail C E hpath hCE ih =>
           obtain ⟨z, hzC, hzE⟩ := hCE.2.2
-          exact hmono E hCE.2.1 B hB ⟨z, hzE, ih hzC⟩
+          exact hmono E hCE.2.1 B hB ⟨z, hzE, ih hCE.1 hzC⟩
     exact hend hyE
   change P = {Set.univ}
   apply Set.ext
@@ -129,23 +132,25 @@ piece, then use the closed overlap decomposition theorem.
 
 Corollary 3 of Aleksandrov, Kuske and Völlinger, *(μ,ε)-Robustness: Characterization, Existence, and Precision-Dependent Bounds*, revised FSEN 2027 manuscript (9 November 2026).
 -/
-lemma partialOrderPrecisionBound {S : Type u} [Finite S] [PartialOrder S]
-    (d : Distance S) (hd : IsOrdered d (· ≤ ·)) (D : Set (Set S))
-    (μ ε : ℝ≥0) (hε : 0 < ε) (hD : IsDecomposition d hd.1 D μ)
-    (hchain : ∀ A ∈ D, ∀ x ∈ A, ∀ y ∈ A, x ≤ y ∨ y ≤ x)
-    (hbound : ∀ A ∈ D, ∀ hA : IsOrdered (restrict d A) (· ≤ ·),
+lemma partialOrderPrecisionBound {S : Type u} [Finite S] [PartialOrder S] [Nontrivial S]
+    (d : Distance S) (hd : IsOrderedSemimetricSpace d (· ≤ ·)) (D : Set (Set S))
+    (μ : ℝ≥0) (ε : ℝ>0) (hD : IsDecomposition d hd.1 D μ)
+    (hchain : ∀ A ∈ D, IsChain (· ≤ ·) A)
+    (hsize : ∀ A ∈ D, Nontrivial A)
+    (hbound : ∀ A ∈ D, ∀ [Std.Total (α := A) (· ≤ ·)] [Nontrivial A], ∀ hA : IsOrderedSemimetricSpace (restrict d A) (· ≤ ·),
       threshold (restrict d A) hA μ ≤ ε) : OnlyTrivial d hd.1 μ ε := by
   classical
-  apply MuepsProofs.Decomposition.decompositionObstruction d hd.1 D μ ε hε hD
+  apply MuepsProofs.Decomposition.decompositionObstruction d hd.1 D μ ε hD
   intro A hA hsm
+  let : Nontrivial A := hsize A hA
   let : LinearOrder A := {
     (inferInstance : PartialOrder A) with
-    le_total := fun x y => hchain A hA x.val x.property y.val y.property
+    le_total := fun x y => (hchain A hA).total x.property y.property
     toDecidableLE := Classical.decRel _ }
-  have ho : IsOrdered (restrict d A) (· ≤ ·) := by
+  have ho : IsOrderedSemimetricSpace (restrict d A) (· ≤ ·) := by
     refine ⟨hsm, inferInstance, ?_⟩
     intro x y z hxy hyz
     exact hd.2.2 x.val y.val z.val hxy hyz
-  exact MuepsProofs.OrderedBounds.precisionObstruction (restrict d A) ho μ ε hε (hbound A hA ho)
+  exact MuepsProofs.OrderedBounds.precisionObstruction (restrict d A) ho μ ε (hbound A hA ho)
 
 end MuepsProofs.Decomposition

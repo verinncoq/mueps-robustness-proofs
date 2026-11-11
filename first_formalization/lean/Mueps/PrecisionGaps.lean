@@ -1,5 +1,5 @@
-/- Adapted from lax-544225, source 5d812af45275f298dec0e9e4465d6a665e95656b.
-   Standalone Lean port, 18 October 2026: archive assumptions replaced by proved dependencies.
+/- Adapted from lax-544225, source 62ba21d994907b076c31bc2328e0c3209bd1ea17.
+   Standalone Lean port, synchronized 11 November 2026: archive assumptions replaced by proved dependencies.
    Formalization: Clemens Kuske and Codex (OpenAI). Apache-2.0. -/
 
 import Mueps.OrderedSemimetric
@@ -24,7 +24,7 @@ where $|\cdot|$ denotes set cardinality.
 
 # Formalization notes
 
-The formulas take an ordered semimetric on a finite partially ordered carrier. The paper applies them to totally ordered carriers or pieces. The interval uses the ambient order of that carrier or piece. Natural cardinalities are cast into ℝ≥0 before division. Suprema of the finite ratio sets are their maxima. On a singleton the ratio sets are empty and Δ=δ=0, extending the paper’s undefined singleton case so decomposition pieces of size one need no arbitrary parameters. Δ equals the largest adjacent gap only for an additive distance; no such equality is presumed for general semimetrics.
+The formulas require a finite totally ordered carrier with at least two elements, as in the paper. `PartialOrder` together with `Std.Total` expresses a total order; `Nontrivial` expresses the existence of two distinct elements. The interval uses the inherited order of the carrier or piece. Natural cardinalities are cast into ℝ≥0 before division. The ratio sets are finite and nonempty, so their suprema are maxima. Δ equals the largest adjacent gap only for an additive distance; no such equality is presumed for general semimetrics.
 -/
 
 universe u
@@ -33,23 +33,27 @@ namespace Mueps.PrecisionGaps
 
 open scoped NNReal
 
-open Semimetric OrderedSemimetric
+open SemimetricSpace OrderedSemimetric
 /-- The number of consecutive steps between the endpoints of a closed interval. -/
-noncomputable def steps {S : Type u} [PartialOrder S] (x y : S) : ℕ :=
+noncomputable def steps {S : Type u} [Finite S] [PartialOrder S]
+    [Std.Total (α := S) (· ≤ ·)] (x y : S) : ℕ :=
   (Set.Icc x y).ncard - 1
 
 /-- The largest average distance per ordered step. -/
-noncomputable def deltaUpper {S : Type u} [Finite S] [PartialOrder S] (d : Distance S)
-    (_hd : IsOrdered d (· ≤ ·)) : ℝ≥0 :=
+noncomputable def deltaUpper {S : Type u} [Finite S] [PartialOrder S]
+    [Std.Total (α := S) (· ≤ ·)] [Nontrivial S] (d : Distance S)
+    (_hd : IsOrderedSemimetricSpace d (· ≤ ·)) : ℝ≥0 :=
   sSup {r | ∃ x y, x < y ∧ r = d x y / (steps x y : ℝ≥0)}
 
 /-- The largest number of ordered steps per unit distance. -/
-noncomputable def deltaInverse {S : Type u} [Finite S] [PartialOrder S] (d : Distance S)
-    (_hd : IsOrdered d (· ≤ ·)) : ℝ≥0 :=
+noncomputable def deltaInverse {S : Type u} [Finite S] [PartialOrder S]
+    [Std.Total (α := S) (· ≤ ·)] [Nontrivial S] (d : Distance S)
+    (_hd : IsOrderedSemimetricSpace d (· ≤ ·)) : ℝ≥0 :=
   sSup {r | ∃ x y, x < y ∧ r = (steps x y : ℝ≥0) / d x y}
 
 /-- The paper’s precision-dependent obstruction threshold Δδμ+Δ. -/
-noncomputable def threshold {S : Type u} [Finite S] [PartialOrder S] (d : Distance S)
-    (hd : IsOrdered d (· ≤ ·)) (μ : ℝ≥0) : ℝ≥0 := deltaUpper d hd * deltaInverse d hd * μ + deltaUpper d hd
+noncomputable def threshold {S : Type u} [Finite S] [PartialOrder S]
+    [Std.Total (α := S) (· ≤ ·)] [Nontrivial S] (d : Distance S)
+    (hd : IsOrderedSemimetricSpace d (· ≤ ·)) (μ : ℝ≥0) : ℝ≥0 := deltaUpper d hd * deltaInverse d hd * μ + deltaUpper d hd
 
 end Mueps.PrecisionGaps

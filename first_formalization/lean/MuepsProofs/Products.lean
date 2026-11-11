@@ -1,5 +1,5 @@
-/- Adapted from lax-544225, source 5d812af45275f298dec0e9e4465d6a665e95656b.
-   Standalone Lean port, 18 October 2026: archive assumptions replaced by proved dependencies.
+/- Adapted from lax-544225, source 62ba21d994907b076c31bc2328e0c3209bd1ea17.
+   Standalone Lean port, synchronized 11 November 2026: archive assumptions replaced by proved dependencies.
    Formalization: Clemens Kuske and Codex (OpenAI). Apache-2.0. -/
 
 import Mueps.Definitions
@@ -8,7 +8,7 @@ universe u
 
 namespace MuepsProofs
 
-open Mueps.Semimetric Mueps.OrderedSemimetric Mueps.SumProductSpace Mueps.MaximumProductSpace
+open Mueps.SemimetricSpace Mueps.OrderedSemimetric Mueps.SumProductSpace Mueps.MaximumProductSpace
 open scoped NNReal BigOperators
 
 lemma product_partialOrder {S : Type u} (le : S → S → Prop)
@@ -23,7 +23,7 @@ lemma product_partialOrder {S : Type u} (le : S → S → Prop)
     exact h.antisymm (f i) (g i) (hfg i) (hgf i)
 
 lemma sum_product_semimetric {S : Type u} (d : Distance S)
-    (hd : IsSemimetric d) (n : ℕ) : IsSemimetric (sumDistance d n) := by
+    (hd : IsSemimetricSpace d) (n : ℕ) : IsSemimetricSpace (sumDistance d n) := by
   classical
   rcases hd.1 with ⟨s⟩
   refine ⟨⟨fun _ => s⟩, ?_, ?_⟩
@@ -43,7 +43,7 @@ lemma sum_product_semimetric {S : Type u} (d : Distance S)
     exact Finset.sum_congr rfl (fun i _ => hd.2.2 (f i) (g i))
 
 lemma max_product_semimetric {S : Type u} (d : Distance S)
-    (hd : IsSemimetric d) (n : ℕ) : IsSemimetric (maxDistance d n) := by
+    (hd : IsSemimetricSpace d) (n : ℕ) : IsSemimetricSpace (maxDistance d n) := by
   classical
   rcases hd.1 with ⟨s⟩
   refine ⟨⟨fun _ => s⟩, ?_, ?_⟩
@@ -78,7 +78,7 @@ coordinatewise. The empty product is included by the same finite-sum laws.
 Proposition 1.3 of Aleksandrov, Kuske and Völlinger's supplied FSEN 2027 manuscript.
 -/
 lemma sumProductSpace {S : Type u} (d : Distance S) (le : S → S → Prop)
-    (hd : IsOrdered d le) (n : ℕ) : IsOrdered (sumDistance d n) (productLe le n) := by
+    (hd : IsOrderedSemimetricSpace d le) (n : ℕ) : IsOrderedSemimetricSpace (sumDistance d n) (productLe le n) := by
   refine ⟨sum_product_semimetric d hd.1 n, product_partialOrder le hd.2.1 n, ?_⟩
   intro f g k hfg hgk
   unfold sumDistance
@@ -86,7 +86,7 @@ lemma sumProductSpace {S : Type u} (d : Distance S) (le : S → S → Prop)
   exact Finset.sum_le_sum (fun i _ => hd.2.2 (f i) (g i) (k i) (hfg i) (hgk i))
 
 lemma synchronized_partialOrder {S : Type u} (d : Distance S) (le : S → S → Prop)
-    (hd : IsOrdered d le) (hadd : Additive d le) (n : ℕ) :
+    (hd : IsOrderedSemimetricSpace d le) (hadd : Additive d le) (n : ℕ) :
     IsPartialOrder (Fin n → S) (synchronizedLe d le n) := by
   refine { refl := ?_, trans := ?_, antisymm := ?_ }
   · intro f
@@ -111,7 +111,7 @@ lemma synchronized_max_eq_coordinate {S : Type u} (d : Distance S) (le : S → S
   · exact Finset.le_sup (f := fun j => d (f j) (g j)) (Finset.mem_univ i)
 
 lemma synchronized_max_additive {S : Type u} (d : Distance S) (le : S → S → Prop)
-    (hd : IsOrdered d le) (hadd : Additive d le) (n : ℕ) :
+    (hd : IsOrderedSemimetricSpace d le) (hadd : Additive d le) (n : ℕ) :
     Additive (maxDistance d n) (synchronizedLe d le n) := by
   intro f g k hfg hgk
   cases n with
@@ -140,8 +140,8 @@ Proposition 1.4 of Aleksandrov, Kuske and Völlinger's supplied FSEN 2027 manusc
 the synchronized construction is also described in the cited Rocq reference.
 -/
 lemma maximumProductSpace {S : Type u} (d : Distance S) (le : S → S → Prop)
-    (hd : IsOrdered d le) (hadd : Additive d le) (n : ℕ) :
-    IsOrdered (maxDistance d n) (synchronizedLe d le n) := by
+    (hd : IsOrderedSemimetricSpace d le) (hadd : Additive d le) (n : ℕ) :
+    IsOrderedSemimetricSpace (maxDistance d n) (synchronizedLe d le n) := by
   refine ⟨max_product_semimetric d hd.1 n, synchronized_partialOrder d le hd hadd n, ?_⟩
   intro f g k hfg hgk
   exact le_of_eq (synchronized_max_additive d le hd hadd n f g k hfg hgk).symm

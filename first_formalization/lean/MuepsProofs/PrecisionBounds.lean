@@ -1,5 +1,5 @@
-/- Adapted from lax-544225, source 5d812af45275f298dec0e9e4465d6a665e95656b.
-   Standalone Lean port, 18 October 2026: archive assumptions replaced by proved dependencies.
+/- Adapted from lax-544225, source 62ba21d994907b076c31bc2328e0c3209bd1ea17.
+   Standalone Lean port, synchronized 11 November 2026: archive assumptions replaced by proved dependencies.
    Formalization: Clemens Kuske and Codex (OpenAI). Apache-2.0. -/
 
 import Mueps.Definitions
@@ -13,7 +13,7 @@ universe u
 namespace MuepsProofs.OrderedBounds
 
 open scoped NNReal
-open Mueps Semimetric OrderedSemimetric Balls CoveringConditions Boundary PrecisionGaps
+open Mueps SemimetricSpace OrderedSemimetric Balls CoveringConditions Boundary PrecisionGaps
 
 lemma steps_pos {S : Type u} [Finite S] [LinearOrder S] {x y : S} (hxy : x < y) :
     0 < steps x y := by
@@ -62,15 +62,15 @@ lemma inverse_ratios_bounded {S : Type u} [Finite S] [LinearOrder S] (d : Distan
   rintro r ⟨x, y, _, rfl⟩
   exact ⟨(x, y), rfl⟩
 
-lemma distance_upper {S : Type u} [Finite S] [LinearOrder S] (d : Distance S)
-    (hd : IsOrdered d (· ≤ ·)) {x y : S} (hxy : x < y) :
+lemma distance_upper {S : Type u} [Finite S] [LinearOrder S] [Nontrivial S] (d : Distance S)
+    (hd : IsOrderedSemimetricSpace d (· ≤ ·)) {x y : S} (hxy : x < y) :
     d x y ≤ deltaUpper d hd * (steps x y : ℝ≥0) := by
   have hratio : d x y / (steps x y : ℝ≥0) ≤ deltaUpper d hd :=
     le_csSup (upper_ratios_bounded d) ⟨x, y, hxy, rfl⟩
   exact (div_le_iff₀ (by exact_mod_cast steps_pos hxy)).1 hratio
 
-lemma steps_inverse {S : Type u} [Finite S] [LinearOrder S] (d : Distance S)
-    (hd : IsOrdered d (· ≤ ·)) {x y : S} (hxy : x < y) :
+lemma steps_inverse {S : Type u} [Finite S] [LinearOrder S] [Nontrivial S] (d : Distance S)
+    (hd : IsOrderedSemimetricSpace d (· ≤ ·)) {x y : S} (hxy : x < y) :
     (steps x y : ℝ≥0) ≤ deltaInverse d hd * d x y := by
   have hdpos : 0 < d x y := pos_iff_ne_zero.2 (by
     intro hz
@@ -79,8 +79,8 @@ lemma steps_inverse {S : Type u} [Finite S] [LinearOrder S] (d : Distance S)
     le_csSup (inverse_ratios_bounded d) ⟨x, y, hxy, rfl⟩
   exact (div_le_iff₀ hdpos).1 hratio
 
-lemma precision_product_ge_one {S : Type u} [Finite S] [LinearOrder S] (d : Distance S)
-    (hd : IsOrdered d (· ≤ ·)) {x y : S} (hxy : Successor x y) :
+lemma precision_product_ge_one {S : Type u} [Finite S] [LinearOrder S] [Nontrivial S] (d : Distance S)
+    (hd : IsOrderedSemimetricSpace d (· ≤ ·)) {x y : S} (hxy : Successor x y) :
     1 ≤ deltaUpper d hd * deltaInverse d hd := by
   have hu := distance_upper d hd hxy.lt
   have hi := steps_inverse d hd hxy.lt
@@ -102,8 +102,8 @@ other side of the successor, the ordered antitriangle inequality gives monotonic
 # Attribution
 Aleksandrov, Kuske and Völlinger, Theorem 4.
 -/
-theorem successorCovering {S : Type u} [Finite S] [LinearOrder S] (d : Distance S)
-    (hd : IsOrdered d (· ≤ ·)) (μ ε : ℝ≥0) (_hε : 0 < ε)
+theorem successorCovering {S : Type u} [Finite S] [LinearOrder S] [Nontrivial S] (d : Distance S)
+    (hd : IsOrderedSemimetricSpace d (· ≤ ·)) (μ : ℝ≥0) (ε : ℝ>0)
     (hbound : threshold d hd μ ≤ ε) (x y : S) (hxy : Successor x y) :
     ball d hd.1 x μ ⊆ ball d hd.1 y ε := by
   intro z hz
@@ -137,6 +137,5 @@ theorem successorCovering {S : Type u} [Finite S] [LinearOrder S] (d : Distance 
     rw [hd.1.2.2 z y, hd.1.2.2 z x] at *
     exact ((le_add_of_nonneg_left (show 0 ≤ d x y from zero_le)).trans
       (hd.2.2 x y z hxy.le hyz)).trans (hz.trans (hμ.trans hbound))
-
 
 end MuepsProofs.OrderedBounds

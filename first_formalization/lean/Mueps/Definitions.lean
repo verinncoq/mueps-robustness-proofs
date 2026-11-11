@@ -2,8 +2,8 @@ import Mueps.Balls
 import Mueps.BinaryFloats
 import Mueps.Boundary
 import Mueps.Classifier
-import Mueps.ClassifierRobustness
 import Mueps.Decomposition
+import Mueps.EpsilonRobustness
 import Mueps.FloatAbsoluteSpace
 import Mueps.FloatSquaredSpace
 import Mueps.ListSpaces
@@ -12,5 +12,5 @@ import Mueps.OrderedSemimetric
 import Mueps.PartitionRobustness
 import Mueps.Partitions
 import Mueps.PrecisionGaps
-import Mueps.Semimetric
+import Mueps.SemimetricSpace
 import Mueps.SumProductSpace

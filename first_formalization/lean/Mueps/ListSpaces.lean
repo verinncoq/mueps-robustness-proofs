@@ -1,5 +1,5 @@
-/- Adapted from lax-544225, source 5d812af45275f298dec0e9e4465d6a665e95656b.
-   Standalone Lean port, 18 October 2026: archive assumptions replaced by proved dependencies.
+/- Adapted from lax-544225, source 62ba21d994907b076c31bc2328e0c3209bd1ea17.
+   Standalone Lean port, synchronized 11 November 2026: archive assumptions replaced by proved dependencies.
    Formalization: Clemens Kuske and Codex (OpenAI). Apache-2.0. -/
 
 import Mueps.MaximumProductSpace
@@ -32,7 +32,7 @@ namespace Mueps.ListSpaces
 
 open scoped NNReal
 
-open Semimetric OrderedSemimetric
+open SemimetricSpace OrderedSemimetric
 open scoped BigOperators
 /-- Equal-length lists ordered coordinatewise; other lengths are incomparable. -/
 def listLe {S : Type u} (le : S → S → Prop) (pad : S) (f g : List S) : Prop :=
@@ -57,6 +57,5 @@ noncomputable def sumDistance {S : Type u} (d : Distance S) (pad : S) : Distance
 noncomputable def maxDistance {S : Type u} (d : Distance S) (pad : S) : Distance (List S) :=
   fun f g => lengthPenalty f g +
     (Finset.range (max f.length g.length)).sup (fun i => d (f.getD i pad) (g.getD i pad))
-
 
 end Mueps.ListSpaces

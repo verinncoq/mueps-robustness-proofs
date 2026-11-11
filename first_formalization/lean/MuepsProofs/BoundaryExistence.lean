@@ -1,5 +1,5 @@
-/- Adapted from lax-544225, source 5d812af45275f298dec0e9e4465d6a665e95656b.
-   Standalone Lean port, 18 October 2026: archive assumptions replaced by proved dependencies.
+/- Adapted from lax-544225, source 62ba21d994907b076c31bc2328e0c3209bd1ea17.
+   Standalone Lean port, synchronized 11 November 2026: archive assumptions replaced by proved dependencies.
    Formalization: Clemens Kuske and Codex (OpenAI). Apache-2.0. -/
 
 import Mueps.Definitions
@@ -14,7 +14,7 @@ universe u
 namespace MuepsProofs.OrderedBounds
 
 open scoped NNReal
-open Mueps Semimetric OrderedSemimetric Balls CoveringConditions Boundary PrecisionGaps
+open Mueps SemimetricSpace OrderedSemimetric Balls CoveringConditions Boundary PrecisionGaps
 
 /--
 Only-trivial robustness gives opposite-boundary covering.
@@ -26,11 +26,11 @@ Compose the general existence criterion with its finite-order boundary reduction
 Aleksandrov, Kuske and Völlinger, Corollary 1, forward direction.
 -/
 lemma trivialityToBoundaryCovering {S : Type u} [Finite S] [LinearOrder S]
-    (d : Distance S) (hd : IsOrdered d (· ≤ ·)) (μ ε : ℝ≥0) (hε : 0 < ε) :
+    (d : Distance S) (hd : IsOrderedSemimetricSpace d (· ≤ ·)) (μ : ℝ≥0) (ε : ℝ>0) :
     Mueps.PartitionRobustness.OnlyTrivial d hd.1 μ ε → EveryCutBoundaryCovered d hd.1 μ ε := by
   intro h
-  exact (MuepsProofs.MainResults.boundaryCoveringCharacterization d hd μ ε hε).mp
-    ((MuepsProofs.MainResults.generalExistence d hd.1 μ ε hε).mp h)
+  exact (MuepsProofs.MainResults.boundaryCoveringCharacterization d hd μ ε).mp
+    ((MuepsProofs.MainResults.generalExistence d hd.1 μ ε).mp h)
 
 /--
 Opposite-boundary covering excludes nontrivial robust partitions.
@@ -42,10 +42,10 @@ Compose the boundary extension with the previously established general cut crite
 Aleksandrov, Kuske and Völlinger, Corollary 1, reverse direction.
 -/
 lemma boundaryCoveringToTriviality {S : Type u} [Finite S] [LinearOrder S]
-    (d : Distance S) (hd : IsOrdered d (· ≤ ·)) (μ ε : ℝ≥0) (hε : 0 < ε) :
+    (d : Distance S) (hd : IsOrderedSemimetricSpace d (· ≤ ·)) (μ : ℝ≥0) (ε : ℝ>0) :
     EveryCutBoundaryCovered d hd.1 μ ε → Mueps.PartitionRobustness.OnlyTrivial d hd.1 μ ε := by
   intro h
-  exact (MuepsProofs.MainResults.generalExistence d hd.1 μ ε hε).mpr
-    ((MuepsProofs.MainResults.boundaryCoveringCharacterization d hd μ ε hε).mpr h)
+  exact (MuepsProofs.MainResults.generalExistence d hd.1 μ ε).mpr
+    ((MuepsProofs.MainResults.boundaryCoveringCharacterization d hd μ ε).mpr h)
 
 end MuepsProofs.OrderedBounds

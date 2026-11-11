@@ -1,5 +1,5 @@
-/- Adapted from lax-544225, source 900b50f00c2873ad4040686a9eda95507c5c4055.
-   Standalone Lean port, 10 November 2026.
+/- Adapted from lax-544225, source 62ba21d994907b076c31bc2328e0c3209bd1ea17.
+   Standalone Lean port, synchronized 11 November 2026: archive assumptions replaced by proved dependencies.
    Formalization: Clemens Kuske and Codex (OpenAI). Apache-2.0. -/
 
 import Mueps.OrderedSemimetric
@@ -9,7 +9,7 @@ import Mueps.OrderedSemimetric
 namespace MuepsProofs.PaperExamples
 
 open scoped NNReal
-open Mueps.Semimetric Mueps.OrderedSemimetric
+open Mueps.SemimetricSpace Mueps.OrderedSemimetric
 
 /-- The ordinary absolute distance on the real line. -/
 def realAbsDistance (x y : ℝ) : ℝ≥0 := Real.toNNReal |x - y|
@@ -24,7 +24,7 @@ lemma realSquaredDistance_coe (x y : ℝ) : (realSquaredDistance x y : ℝ) = (x
   exact Real.coe_toNNReal _ (sq_nonneg _)
 
 /-- Absolute distance on ℝ is an ordered semimetric space. -/
-lemma realAbsDistance_isOrdered : IsOrdered realAbsDistance (· ≤ ·) := by
+lemma realAbsDistance_isOrdered : IsOrderedSemimetricSpace realAbsDistance (· ≤ ·) := by
   refine ⟨?_, inferInstance, ?_⟩
   · refine ⟨⟨⟨0⟩⟩, ?_, ?_⟩
     · intro x y
@@ -46,7 +46,7 @@ lemma realAbsDistance_isOrdered : IsOrdered realAbsDistance (· ≤ ·) := by
     nlinarith
 
 /-- Squared distance on ℝ is an ordered semimetric space. -/
-lemma realSquaredDistance_isOrdered : IsOrdered realSquaredDistance (· ≤ ·) := by
+lemma realSquaredDistance_isOrdered : IsOrderedSemimetricSpace realSquaredDistance (· ≤ ·) := by
   refine ⟨?_, inferInstance, ?_⟩
   · refine ⟨⟨⟨0⟩⟩, ?_, ?_⟩
     · intro x y

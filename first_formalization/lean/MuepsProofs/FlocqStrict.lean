@@ -1,5 +1,5 @@
-/- Adapted from lax-544225, source 900b50f00c2873ad4040686a9eda95507c5c4055.
-   Standalone Lean port, 10 November 2026.
+/- Adapted from lax-544225, source 62ba21d994907b076c31bc2328e0c3209bd1ea17.
+   Standalone Lean port, synchronized 11 November 2026: archive assumptions replaced by proved dependencies.
    Formalization: Clemens Kuske and Codex (OpenAI). Apache-2.0. -/
 
 import MuepsProofs.FloatEmbedding

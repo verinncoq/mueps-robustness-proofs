@@ -1,5 +1,5 @@
-/- Adapted from lax-544225, source 5d812af45275f298dec0e9e4465d6a665e95656b.
-   Standalone Lean port, 18 October 2026: archive assumptions replaced by proved dependencies.
+/- Adapted from lax-544225, source 62ba21d994907b076c31bc2328e0c3209bd1ea17.
+   Standalone Lean port, synchronized 11 November 2026: archive assumptions replaced by proved dependencies.
    Formalization: Clemens Kuske and Codex (OpenAI). Apache-2.0. -/
 
 import Mueps.Definitions
@@ -13,7 +13,7 @@ universe u
 namespace MuepsProofs.OrderedBounds
 
 open scoped NNReal
-open Mueps Semimetric OrderedSemimetric Balls CoveringConditions Boundary PrecisionGaps
+open Mueps SemimetricSpace OrderedSemimetric Balls CoveringConditions Boundary PrecisionGaps
 
 /-- The standard cover relation is the paper's strict no-between successor relation. -/
 lemma successor_iff {S : Type u} [LinearOrder S] (x y : S) :
@@ -40,8 +40,8 @@ lemma crossing_pair {S : Type u} [Finite S] [LinearOrder S] (A : Set S)
 
 /-- Moving an opposite-side center towards the point gives a boundary center no farther away. -/
 lemma boundary_center {S : Type u} [Finite S] [LinearOrder S] {d : Distance S}
-    (hd : IsOrdered d (· ≤ ·)) (A : Set S) {a b : S} (ha : a ∈ A) (hb : b ∉ A) :
-    ∃ z ∈ complementBoundary A, d a z ≤ d a b := by
+    (hd : IsOrderedSemimetricSpace d (· ≤ ·)) (A : Set S) {a b : S} (ha : a ∈ A) (hb : b ∉ A) :
+    ∃ z ∈ boundary Aᶜ, d a z ≤ d a b := by
   classical
   have hne : a ≠ b := by rintro rfl; exact hb ha
   rcases lt_or_gt_of_ne hne with hab | hba
@@ -67,7 +67,7 @@ The ordered antitriangle inequality makes the boundary center no farther away.
 Aleksandrov, Kuske and Völlinger, Theorem 3, forward direction.
 -/
 lemma cutToBoundaryCovering {S : Type u} [Finite S] [LinearOrder S] (d : Distance S)
-    (hd : IsOrdered d (· ≤ ·)) (μ ε : ℝ≥0) (_hε : 0 < ε) :
+    (hd : IsOrderedSemimetricSpace d (· ≤ ·)) (μ : ℝ≥0) (ε : ℝ>0) :
     EveryCutCovered d hd.1 μ ε → EveryCutBoundaryCovered d hd.1 μ ε := by
   intro h A hA hAc
   obtain ⟨x, hx | hx⟩ := h A hA hAc
@@ -80,7 +80,7 @@ lemma cutToBoundaryCovering {S : Type u} [Finite S] [LinearOrder S] (d : Distanc
     intro y hy
     obtain ⟨z, hz, hyz⟩ := hx.2 hy.1
     obtain ⟨b, hb, hyb⟩ := boundary_center hd Aᶜ hy.2 (by simpa using hz)
-    exact ⟨b, by simpa [complementBoundary] using hb, hyb.trans hyz⟩
+    exact ⟨b, by simpa only [compl_compl] using hb, hyb.trans hyz⟩
 
 /--
 Extend the side-restricted covering to the whole ball.
@@ -93,7 +93,7 @@ belong to their own closed epsilon-ball because their self-distance is zero.
 Aleksandrov, Kuske and Völlinger, Theorem 3, reverse direction.
 -/
 lemma boundaryToCutCovering {S : Type u} [Finite S] [LinearOrder S] (d : Distance S)
-    (hd : IsOrdered d (· ≤ ·)) (μ ε : ℝ≥0) (_hε : 0 < ε) :
+    (hd : IsOrderedSemimetricSpace d (· ≤ ·)) (μ : ℝ≥0) (ε : ℝ>0) :
     EveryCutBoundaryCovered d hd.1 μ ε → EveryCutCovered d hd.1 μ ε := by
   classical
   intro h A hA hAc
@@ -110,6 +110,5 @@ lemma boundaryToCutCovering {S : Type u} [Finite S] [LinearOrder S] (d : Distanc
     · exact ⟨y, hyA, by simp [ball, Basic.distance_self hd.1]⟩
     · obtain ⟨z, hz, hyz⟩ := hx.2 ⟨hy, hyA⟩
       exact ⟨z, hz.1, hyz⟩
-
 
 end MuepsProofs.OrderedBounds

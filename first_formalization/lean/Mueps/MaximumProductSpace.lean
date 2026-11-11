@@ -1,5 +1,5 @@
-/- Adapted from lax-544225, source 5d812af45275f298dec0e9e4465d6a665e95656b.
-   Standalone Lean port, 18 October 2026: archive assumptions replaced by proved dependencies.
+/- Adapted from lax-544225, source 62ba21d994907b076c31bc2328e0c3209bd1ea17.
+   Standalone Lean port, synchronized 11 November 2026: archive assumptions replaced by proved dependencies.
    Formalization: Clemens Kuske and Codex (OpenAI). Apache-2.0. -/
 
 import Mueps.SumProductSpace
@@ -29,7 +29,7 @@ universe u
 
 namespace Mueps.MaximumProductSpace
 
-open Semimetric OrderedSemimetric SumProductSpace
+open SemimetricSpace OrderedSemimetric SumProductSpace
 
 /-- Coordinatewise order restricted to equal distances in every coordinate. -/
 def synchronizedLe {S : Type u} (d : Distance S) (le : S → S → Prop) (n : ℕ)
@@ -39,6 +39,5 @@ def synchronizedLe {S : Type u} (d : Distance S) (le : S → S → Prop) (n : �
 /-- Maximum of the base distances between corresponding coordinates. -/
 noncomputable def maxDistance {S : Type u} (d : Distance S) (n : ℕ) : Distance (Fin n → S) :=
   fun f g => Finset.univ.sup (fun i => d (f i) (g i))
-
 
 end Mueps.MaximumProductSpace

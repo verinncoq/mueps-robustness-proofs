@@ -1,5 +1,5 @@
-/- Adapted from lax-544225, source 5d812af45275f298dec0e9e4465d6a665e95656b.
-   Standalone Lean port, 18 October 2026: archive assumptions replaced by proved dependencies.
+/- Adapted from lax-544225, source 62ba21d994907b076c31bc2328e0c3209bd1ea17.
+   Standalone Lean port, synchronized 11 November 2026: archive assumptions replaced by proved dependencies.
    Formalization: Clemens Kuske and Codex (OpenAI). Apache-2.0. -/
 
 import Mueps.BinaryFloats
@@ -28,8 +28,7 @@ open BinaryFloats OrderedSemimetric
 open scoped NNReal
 
 /-- Absolute embedded distance d₁. -/
-noncomputable def absDistance (F : Format) (x y : Value F) : ℝ≥0 :=
-  Real.toNNReal (|phi F x - phi F y|)
-
+noncomputable def absDistance (F : Format) (f₁ f₂ : Value F) : ℝ≥0 :=
+  Real.toNNReal (|phi F f₁ - phi F f₂|)
 
 end Mueps.FloatAbsoluteSpace

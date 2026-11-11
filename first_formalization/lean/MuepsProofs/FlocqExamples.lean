@@ -1,5 +1,5 @@
-/- Adapted from lax-544225, source 900b50f00c2873ad4040686a9eda95507c5c4055.
-   Standalone Lean port, 10 November 2026.
+/- Adapted from lax-544225, source 62ba21d994907b076c31bc2328e0c3209bd1ea17.
+   Standalone Lean port, synchronized 11 November 2026: archive assumptions replaced by proved dependencies.
    Formalization: Clemens Kuske and Codex (OpenAI). Apache-2.0. -/
 
 import MuepsProofs.FlocqBridge
@@ -14,7 +14,7 @@ these declarations are illustrations and do not add concepts.
 
 namespace MuepsProofs.FlocqExamples
 
-open Mueps.Semimetric Mueps.OrderedSemimetric
+open Mueps.SemimetricSpace Mueps.OrderedSemimetric
 open Mueps.BinaryFloats Mueps.FloatAbsoluteSpace Mueps.FloatSquaredSpace
 open Mueps.SumProductSpace Mueps.MaximumProductSpace Mueps.ListSpaces
 open MuepsProofs.FlocqBridge
@@ -215,25 +215,25 @@ lemma binary64NaNListLengthPenalty :
     sup_range_two, List.getD, d_nan_nan]
 
 lemma binary64SumProductOrdered (n : ℕ) :
-    IsOrdered (sumDistance (absDistance binary64) n) (productLe (ieeeLe binary64) n) := by
+    IsOrderedSemimetricSpace (sumDistance (absDistance binary64) n) (productLe (ieeeLe binary64) n) := by
   exact MuepsProofs.sumProductSpace (absDistance binary64) (ieeeLe binary64)
     (FloatEmbedding.floatAbsoluteSpace binary64) n
 
 lemma binary64MaximumProductOrdered (n : ℕ) :
-    IsOrdered (Mueps.MaximumProductSpace.maxDistance (absDistance binary64) n)
+    IsOrderedSemimetricSpace (Mueps.MaximumProductSpace.maxDistance (absDistance binary64) n)
       (Mueps.MaximumProductSpace.synchronizedLe (absDistance binary64) (ieeeLe binary64) n) := by
   exact MuepsProofs.maximumProductSpace (absDistance binary64) (ieeeLe binary64)
     (FloatEmbedding.floatAbsoluteSpace binary64)
     (FloatEmbedding.floatAbsoluteAdditivity binary64) n
 
 lemma binary64SumListOrdered :
-    IsOrdered (Mueps.ListSpaces.sumDistance (absDistance binary64) Value.nan)
+    IsOrderedSemimetricSpace (Mueps.ListSpaces.sumDistance (absDistance binary64) Value.nan)
       (Mueps.ListSpaces.listLe (ieeeLe binary64) Value.nan) := by
   exact MuepsProofs.sumListSpace (absDistance binary64) (ieeeLe binary64)
     (FloatEmbedding.floatAbsoluteSpace binary64) Value.nan
 
 lemma binary64MaximumListOrdered :
-    IsOrdered (Mueps.ListSpaces.maxDistance (absDistance binary64) Value.nan)
+    IsOrderedSemimetricSpace (Mueps.ListSpaces.maxDistance (absDistance binary64) Value.nan)
       (Mueps.ListSpaces.synchronizedListLe (absDistance binary64) (ieeeLe binary64) Value.nan) := by
   exact MuepsProofs.maximumListSpace (absDistance binary64) (ieeeLe binary64)
     (FloatEmbedding.floatAbsoluteSpace binary64)

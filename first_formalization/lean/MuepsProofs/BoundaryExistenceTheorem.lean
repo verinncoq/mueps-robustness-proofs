@@ -1,15 +1,17 @@
-/- Adapted from lax-544225, source 5d812af45275f298dec0e9e4465d6a665e95656b.
-   Standalone Lean port, 18 October 2026: archive assumptions replaced by proved dependencies.
+/- Adapted from lax-544225, source 62ba21d994907b076c31bc2328e0c3209bd1ea17.
+   Standalone Lean port, synchronized 11 November 2026: archive assumptions replaced by proved dependencies.
    Formalization: Clemens Kuske and Codex (OpenAI). Apache-2.0. -/
 
 import Mueps.Definitions
 import MuepsProofs.BoundaryExistence
+
 universe u
 
 namespace MuepsProofs.MainResults
 
 open scoped NNReal
-open Mueps Semimetric Partitions PartitionRobustness CoveringConditions OrderedSemimetric Boundary
+open Mueps SemimetricSpace Partitions PartitionRobustness CoveringConditions
+  OrderedSemimetric Boundary
 
 /--
 Corollary 1: only-trivial robustness is equivalent to opposite-boundary covering.
@@ -25,10 +27,9 @@ boundary characterization converts cut covering to boundary covering.
 Corollary 1 of Aleksandrov, Kuske and Völlinger, *(μ,ε)-Robustness: Characterization, Existence, and Precision-Dependent Bounds*, revised FSEN 2027 manuscript (9 November 2026).
 -/
 lemma boundaryExistence {S : Type u} [Finite S] [LinearOrder S]
-    (d : Distance S) (hd : IsOrdered d (· ≤ ·)) (μ ε : ℝ≥0) (hε : 0 < ε) :
+    (d : Distance S) (hd : IsOrderedSemimetricSpace d (· ≤ ·)) (μ : ℝ≥0) (ε : ℝ>0) :
     OnlyTrivial d hd.1 μ ε ↔ EveryCutBoundaryCovered d hd.1 μ ε :=
-  ⟨OrderedBounds.trivialityToBoundaryCovering d hd μ ε hε,
-    OrderedBounds.boundaryCoveringToTriviality d hd μ ε hε⟩
-
+  ⟨OrderedBounds.trivialityToBoundaryCovering d hd μ ε,
+    OrderedBounds.boundaryCoveringToTriviality d hd μ ε⟩
 
 end MuepsProofs.MainResults

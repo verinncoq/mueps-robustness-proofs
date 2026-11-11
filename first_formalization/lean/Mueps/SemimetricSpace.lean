@@ -1,5 +1,5 @@
-/- Adapted from lax-544225, source 5d812af45275f298dec0e9e4465d6a665e95656b.
-   Standalone Lean port, 18 October 2026: archive assumptions replaced by proved dependencies.
+/- Adapted from lax-544225, source 62ba21d994907b076c31bc2328e0c3209bd1ea17.
+   Standalone Lean port, synchronized 11 November 2026: archive assumptions replaced by proved dependencies.
    Formalization: Clemens Kuske and Codex (OpenAI). Apache-2.0. -/
 
 import Mathlib.Data.NNReal.Basic
@@ -28,15 +28,18 @@ The codomain ℝ≥0 supplies nonnegativity. The carrier is a type; nonemptiness
 
 universe u
 
-namespace Mueps.Semimetric
+namespace Mueps.SemimetricSpace
 
 open scoped NNReal
+
+/-- Strictly positive real numbers, used for robustness radii. -/
+scoped notation "ℝ>0" => {r : ℝ≥0 // 0 < r}
 
 /-- A nonnegative real-valued distance on a carrier. -/
 abbrev Distance (S : Type u) := S → S → ℝ≥0
 
 /-- The defining properties of a semimetric space, including a nonempty carrier. -/
-def IsSemimetric {S : Type u} (d : Distance S) : Prop :=
+def IsSemimetricSpace {S : Type u} (d : Distance S) : Prop :=
   Nonempty S ∧ (∀ x y, d x y = 0 ↔ x = y) ∧ (∀ x y, d x y = d y x)
 
-end Mueps.Semimetric
+end Mueps.SemimetricSpace
