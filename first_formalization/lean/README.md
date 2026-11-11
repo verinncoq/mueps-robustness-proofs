@@ -2,7 +2,7 @@
 
 Lean 4 formalization of Andrei Aleksandrov, Clemens Kuske and Kim Völlinger's
 *(μ,ε)-Robustness: Characterization, Existence, and Precision-Dependent Bounds*
-(revised FSEN 2027 manuscript, 9 November 2026).
+(revised FSEN 2027 manuscript, TeX update received 11 November 2026).
 
 This package contains the definitions and complete proofs for Theorems 1–5,
 Corollaries 1–3, Lemma 1 (both counterexamples), and the five constructions of
@@ -80,7 +80,10 @@ The standalone package introduces no axioms or admitted proofs. The paper aliase
 have the same mathematical signatures as the accepted formalization, up to the
 namespace change. The definitions use the paper's terminology, closed balls, nonnegative μ, and
 strictly positive ε. Precision metrics require finite total orders with at least
-two elements, including each piece in Corollary 3. `Chain` requires its endpoints
+two elements. Corollary 3 also allows singleton decomposition pieces, whose
+paper precision metrics are Δᵢ = δᵢ = 0. Their bound is automatic because ε > 0;
+the proof handles them through the general existence criterion and requires the
+precision bound only for nontrivial pieces. `Chain` requires its endpoints
 to belong to the decomposition family. Lemma 1 states the two failures abstractly;
 its concrete counterexamples are confined to the proof package.
 The existing Rocq file `../formalization.v` is a separate development.
@@ -91,6 +94,9 @@ Originally adapted on 18 October 2026 and synchronized on 11 November 2026
 from the Lean formalization by Clemens Kuske and
 Codex (OpenAI), accepted as [lax-544225](https://laxarchive.org/lax-544225/),
 [source commit 62ba21d994907b076c31bc2328e0c3209bd1ea17](https://github.com/clemenskuske/semimetric-robustness-lax-submission/tree/62ba21d994907b076c31bc2328e0c3209bd1ea17).
+Corollary 3 was subsequently synchronized with
+[source commit 80545d45f49c9ec084a98a6882ac37409889ee1f](https://github.com/clemenskuske/semimetric-robustness-lax-submission/tree/80545d45f49c9ec084a98a6882ac37409889ee1f)
+to match the revised paper's singleton-piece convention.
 The mathematical source and theorem-specific attribution remain in the files.
 The port replaces archive statement assumptions with actual proved dependencies,
 splits modules to preserve an acyclic import graph, and adds the thin paper aliases.

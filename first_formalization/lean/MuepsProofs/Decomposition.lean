@@ -1,9 +1,10 @@
-/- Adapted from lax-544225, source 62ba21d994907b076c31bc2328e0c3209bd1ea17.
+/- Adapted from lax-544225, source 80545d45f49c9ec084a98a6882ac37409889ee1f.
    Standalone Lean port, synchronized 11 November 2026: archive assumptions replaced by proved dependencies.
    Formalization: Clemens Kuske and Codex (OpenAI). Apache-2.0. -/
 
 import Mueps.Definitions
 import MuepsProofs.PrecisionObstruction
+import MuepsProofs.ExistenceTheorem
 import MuepsProofs.SubspaceDistance
 import MuepsProofs.Basic
 import Mathlib.Data.Set.Finite.Basic
@@ -125,24 +126,23 @@ Precision bounds on totally ordered decomposition pieces imply global triviality
 # Proof strategy
 
 Give each piece its inherited linear order, preserving the interval steps in
-its precision measures. Apply the total-order precision obstruction on each
-piece, then use the closed overlap decomposition theorem.
+its precision measures. A singleton has no nonempty proper cut, so the general
+existence criterion gives triviality. Apply the total-order precision obstruction
+on every nontrivial piece, then use the closed overlap decomposition theorem.
 
 # Attribution
 
-Corollary 3 of Aleksandrov, Kuske and Völlinger, *(μ,ε)-Robustness: Characterization, Existence, and Precision-Dependent Bounds*, revised FSEN 2027 manuscript (9 November 2026).
+Corollary 3 of Aleksandrov, Kuske and Völlinger, *(μ,ε)-Robustness: Characterization, Existence, and Precision-Dependent Bounds*, revised FSEN 2027 manuscript (TeX update received 11 November 2026).
 -/
 lemma partialOrderPrecisionBound {S : Type u} [Finite S] [PartialOrder S] [Nontrivial S]
     (d : Distance S) (hd : IsOrderedSemimetricSpace d (· ≤ ·)) (D : Set (Set S))
     (μ : ℝ≥0) (ε : ℝ>0) (hD : IsDecomposition d hd.1 D μ)
     (hchain : ∀ A ∈ D, IsChain (· ≤ ·) A)
-    (hsize : ∀ A ∈ D, Nontrivial A)
     (hbound : ∀ A ∈ D, ∀ [Std.Total (α := A) (· ≤ ·)] [Nontrivial A], ∀ hA : IsOrderedSemimetricSpace (restrict d A) (· ≤ ·),
       threshold (restrict d A) hA μ ≤ ε) : OnlyTrivial d hd.1 μ ε := by
   classical
   apply MuepsProofs.Decomposition.decompositionObstruction d hd.1 D μ ε hD
   intro A hA hsm
-  let : Nontrivial A := hsize A hA
   let : LinearOrder A := {
     (inferInstance : PartialOrder A) with
     le_total := fun x y => (hchain A hA).total x.property y.property
@@ -151,6 +151,14 @@ lemma partialOrderPrecisionBound {S : Type u} [Finite S] [PartialOrder S] [Nontr
     refine ⟨hsm, inferInstance, ?_⟩
     intro x y z hxy hyz
     exact hd.2.2 x.val y.val z.val hxy hyz
-  exact MuepsProofs.OrderedBounds.precisionObstruction (restrict d A) ho μ ε (hbound A hA ho)
+  rcases subsingleton_or_nontrivial A with hsub | hnontrivial
+  · let : Subsingleton A := hsub
+    apply (MuepsProofs.MainResults.generalExistence (restrict d A) hsm μ ε).mpr
+    intro B hB hBc
+    obtain ⟨x, hx⟩ := hB
+    obtain ⟨y, hy⟩ := hBc
+    exact False.elim (hy ((Subsingleton.elim x y) ▸ hx))
+  · let : Nontrivial A := hnontrivial
+    exact MuepsProofs.OrderedBounds.precisionObstruction (restrict d A) ho μ ε (hbound A hA ho)
 
 end MuepsProofs.Decomposition

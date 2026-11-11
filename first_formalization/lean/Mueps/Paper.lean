@@ -1,4 +1,4 @@
-/- Adapted from lax-544225, source 62ba21d994907b076c31bc2328e0c3209bd1ea17.
+/- Adapted from lax-544225, source 80545d45f49c9ec084a98a6882ac37409889ee1f.
    Standalone Lean port, synchronized 11 November 2026: archive assumptions replaced by proved dependencies.
    Formalization: Clemens Kuske and Codex (OpenAI). Apache-2.0. -/
 
@@ -151,17 +151,19 @@ open Mueps
 open scoped NNReal
 open SemimetricSpace OrderedSemimetric Decomposition PartitionRobustness PrecisionGaps
 
-/-- In a finite partially ordered semimetric space, a (μ,ε)-decomposition into totally ordered pieces admits only trivial robust partitions if ε≥Δᵢδᵢμ+Δᵢ for every piece. -/
+/-- In a finite partially ordered semimetric space, a (μ,ε)-decomposition into totally ordered pieces admits only trivial robust partitions if ε≥Δᵢδᵢμ+Δᵢ for every piece.
+
+Singleton pieces have Δᵢ = δᵢ = 0 in the paper, so their bound is automatic.
+Only nontrivial pieces require `hbound`; singleton pieces remain allowed. -/
 theorem corollary3 {S : Type u} [Finite S] [PartialOrder S] [Nontrivial S] (d : Distance S)
     (hd : IsOrderedSemimetricSpace d (· ≤ ·)) (D : Set (Set S)) (μ : ℝ≥0) (ε : ℝ>0)
     (hD : IsDecomposition d hd.1 D μ)
     (hchain : ∀ Dᵢ ∈ D, IsChain (· ≤ ·) Dᵢ)
-    (hsize : ∀ Dᵢ ∈ D, Nontrivial Dᵢ)
     (hbound : ∀ (Dᵢ : Set S) (_hmem : Dᵢ ∈ D)
       [Std.Total (α := Dᵢ) (· ≤ ·)] [Nontrivial Dᵢ]
       (hDᵢ : IsOrderedSemimetricSpace (fun x y : Dᵢ => d x.val y.val) (· ≤ ·)),
       threshold (fun x y : Dᵢ => d x.val y.val) hDᵢ μ ≤ ε) : OnlyTrivial d hd.1 μ ε := by
-  exact MuepsProofs.Decomposition.partialOrderPrecisionBound d hd D μ ε hD hchain hsize hbound
+  exact MuepsProofs.Decomposition.partialOrderPrecisionBound d hd D μ ε hD hchain hbound
 
 end Mueps.Paper.PartialOrderPrecisionBound
 
